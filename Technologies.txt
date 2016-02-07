@@ -1,5 +1,0 @@
-Android
-Python
-Javascript/NodeJs
-Ionic
-React / React Native
