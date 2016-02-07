@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:type" content="article">
+    <title>{{meta_title}}</title>
+    <meta property="og:description" content="{% block description %}{% endblock %}">
+    <meta property="og:site_name" content="GiftSmarts">
+    <base href="/">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}"/>
+    <link href="{{ url_for('static', filename='css/styles.min.css') }}" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div ng-view>{% block container %} {% endblock %}</div>
+        <footer>Copyright &copy; 2016</footer>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
+</body>
+</html>

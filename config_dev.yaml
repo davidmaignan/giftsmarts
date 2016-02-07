@@ -1,0 +1,9 @@
+application:
+    port: 8111
+    threaded: true
+    secret_key: 'secret_key'
+database:
+    user: test
+    pass: Devpass123
+    host: localhost
+    name: flaskskeleton

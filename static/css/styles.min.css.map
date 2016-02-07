@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,MAAO;EACH,OAAO,EAAE,KAAK;EACd,MAAM,EAAE,MAAM;EACd,UAAU,EAAE,MAAM",
+"sources": ["../../app/assets/scss/_footer.scss"],
+"names": [],
+"file": "styles.min.css"
+}

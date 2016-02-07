@@ -1,0 +1,9 @@
+application:
+    port: 8333
+    threaded: true
+    secret_key: '/zK=A>h!0d{`TMy3at.vFJ@S|99)nx&H'
+database:
+    user: prod
+    pass: DFNCn=;8yc<lK:AZg(FC+fjW>5dZTk*2
+    host: localhost
+    name: flaskskeleton
