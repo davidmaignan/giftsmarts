@@ -56,14 +56,18 @@ def token_required(f):
 @app.route("/<path:path>/", methods=["GET"])
 @app.route("/#/<path:path>/", methods=["GET"])
 def index(name="index", *args, **kawrgs):
-    if g.user:
-        graph = GraphAPI(g.user['access_token'])
-        args = {'fields' : 'birthday, name, email, posts, likes, books'}
-        friends = graph.get_object('me/friends', **args);
-        return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
-
     if request.is_xhr:
         return "", 400
+
+    if g.user:
+        try:
+            graph = GraphAPI(g.user['access_token'])
+            args = {'fields' : 'birthday, name, email, posts, likes, books'}
+            friends = graph.get_object('me/friends', **args);
+            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
+        except Exception:
+            return redirect(url_for('logout'))
+
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
 
 
@@ -117,6 +121,8 @@ def check_user_logged_in():
 
     result = get_user_from_cookie(cookies=request.cookies, app_id=app.config["FB_APP_ID"],
                                   app_secret=app.config["FB_APP_SECRET"])
+
+    pprint.pprint(result)
 
     if result:
         user = UserActions.find_by_id(result['uid'])
