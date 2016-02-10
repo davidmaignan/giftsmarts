@@ -6,7 +6,7 @@ class AuthToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(128), unique=False, nullable=False)
     expiration = db.Column(db.DateTime, default=(datetime.now() + timedelta(minutes=15)))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.String, db.ForeignKey('user.id'))
 
 
 class AuthTokenActions():

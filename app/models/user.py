@@ -2,21 +2,41 @@
 from app.constants import ROLES
 import bcrypt
 import re
+import datetime
 from app.config.config import db
 from app.config.config import app
 from app.constants import *
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.Binary(64), nullable=False)
-    active = db.Column(db.Boolean(), default=True)
-    role = db.Column(db.Integer)
-
+    id = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    profile_url = db.Column(db.String, nullable=False)
+    access_token = db.Column(db.String, nullable=False)
+    birthday = db.Column(db.Date, nullable=False)
 
 class UserActions():
     model = User
+
+    @classmethod
+    def find_by_id(cls, user_id):
+        try:
+            user = cls.model.query.filter_by(id=user_id).one()
+            return user
+        except Exception:
+            return None
+
+    @classmethod
+    def create_user(cls, profile, result):
+        try:
+            birthday = datetime.datetime.strptime(profile['birthday'], '%m/%d/%Y').date()
+
+            new_user = cls.model(id=profile['id'], name=profile['name'], profile_url="", birthday=birthday, access_token=result['access_token'])
+            db.session.add(new_user)
+            db.session.commit()
+            return user
+        except Exception:
+            return None
 
     @classmethod
     def get_username(cls, user_id):
