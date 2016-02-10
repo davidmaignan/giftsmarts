@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 if ! hash grunt 2>/dev/null; then
     npm install -g grunt@0.1.13
