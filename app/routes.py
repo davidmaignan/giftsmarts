@@ -122,8 +122,6 @@ def check_user_logged_in():
     result = get_user_from_cookie(cookies=request.cookies, app_id=app.config["FB_APP_ID"],
                                   app_secret=app.config["FB_APP_SECRET"])
 
-    pprint.pprint(result)
-
     if result:
         user = UserActions.find_by_id(result['uid'])
 
