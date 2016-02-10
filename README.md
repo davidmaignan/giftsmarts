@@ -25,6 +25,7 @@ GiftSmarts - Test
 ### Requirements
 * Python 3.4+
 * VirtualEnv 12.1+
+* PostgreSQL 9.4
 
 ### Install
 ```
@@ -41,6 +42,7 @@ GiftSmarts - Test
 ### Requirements
 * Python 3.4+
 * VirtualEnv 12.1+
+* PostgreSQL 9.4
 * NPM 2.8+
 * Node 0.12+
 * Grunt-CLI 0.1.13+
