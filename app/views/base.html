@@ -1,22 +1,53 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="app">
+<html xmlns:fb="http://ogp.me/ns/fb#" lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:type" content="article">
-    <title>{{meta_title}}</title>
-    <meta property="og:description" content="{% block description %}{% endblock %}">
-    <meta property="og:site_name" content="GiftSmarts">
-    <base href="/">
-    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}"/>
-    <link href="{{ url_for('static', filename='css/styles.min.css') }}" type="text/css" rel="stylesheet">
+    <meta name="description" content="to be defined">
+    <meta name="author" content="backslash0">
+
+    <meta property="fb:app_id" content="{{ app_id }}" />
+
+    <title>Gift smarts</title>
+
+    <!-- Style -->
+    <!--[if IE]>
+      <script type="text/javascript">
+        var tags = ['header', 'section'];
+        while(tags.length)
+          document.createElement(tags.pop());
+      </script>
+    <![endif]-->
+     <link href="{{ url_for('static', filename='css/styles.min.css') }}" type="text/css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div ng-view>{% block container %} {% endblock %}</div>
-        <footer>Copyright &copy; 2016</footer>
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : {{ app_id }},
+                status     : true,
+                cookie     : true,
+                xfbml      : true
+            });
+
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location = window.location;
+            });
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+     <div class="container">
+        {% block content %} {% endblock %}
     </div>
+
     <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
 </body>
 </html>

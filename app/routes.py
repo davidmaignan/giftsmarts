@@ -1,10 +1,14 @@
-from flask import render_template, request, jsonify, make_response
+from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+from facebook import get_user_from_cookie, GraphAPI
 import json
+import jwt
+import pprint
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
-from app.models.user import UserActions
-from app.config.config import app
-from app.lib import jwt
+from app.models.user import UserActions, User
+from app.config.config import app, db
+
+
 
 
 def not_found():
@@ -52,9 +56,15 @@ def token_required(f):
 @app.route("/<path:path>/", methods=["GET"])
 @app.route("/#/<path:path>/", methods=["GET"])
 def index(name="index", *args, **kawrgs):
+    if g.user:
+        graph = GraphAPI(g.user['access_token'])
+        args = {'fields' : 'birthday, name, email, posts, likes, books'}
+        friends = graph.get_object('me/friends', **args);
+        return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
+
     if request.is_xhr:
         return "", 400
-    return render_template("index.html")
+    return render_template("login.html", app_id=app.config["FB_APP_ID"])
 
 
 @app.route("/robots.txt")
@@ -63,6 +73,11 @@ def robots():
     if not app.env == "prod":
         return '''User-agent: *\n\nDisallow: /admin/'''
 
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('index'))
 
 @app.route("/api/auth/login", methods=["POST"])
 def login(name="login"):
@@ -92,3 +107,34 @@ def username(name="username", token=None):
     return jsonify(**{
         "username": username
     })
+
+
+@app.before_request
+def check_user_logged_in():
+    if session.get('user'):
+        g.user = session.get('user')
+        return
+
+    result = get_user_from_cookie(cookies=request.cookies, app_id=app.config["FB_APP_ID"],
+                                  app_secret=app.config["FB_APP_SECRET"])
+
+    if result:
+        user = UserActions.find_by_id(result['uid'])
+
+        if not user:
+            graph = GraphAPI(result['access_token'])
+            args = {'fields' : 'birthday, name, email'}
+            profile = graph.get_object('me', **args);
+
+            user = UserActions.create_user(profile, result)
+           
+        elif user.access_token != result['access_token']:
+            user.access_token = result['access_token']
+
+        user = UserActions.find_by_id(result['uid'])
+
+        session['user'] = dict(name=user.name, profile_url=user.profile_url,
+                               id=user.id, access_token=user.access_token)
+
+    db.session.commit()
+    g.user = session.get('user', None)
