@@ -1,5 +1,5 @@
 from app.models.user import UserActions
-from app.lib import jwt
+import jwt
 
 
 class UserAuthentication():
