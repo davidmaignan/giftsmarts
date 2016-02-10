@@ -6,4 +6,8 @@ database:
     user: prod
     pass: DFNCn=;8yc<lK:AZg(FC+fjW>5dZTk*2
     host: localhost
-    name: flaskskeleton
+    name: giftsmarts
+facebook:
+    id: '1670209469887605'
+    name: GiftSmarts
+    secret: 65c27afa66f17051324f3a64243c7133

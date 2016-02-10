@@ -33,13 +33,16 @@ config["BCRYPT_ROUNDS"] = 12
 config["SESSION_DURATION"] = 15
 config["THREADED"] = parsed_config["application"]["threaded"]
 config["SECRET_KEY"] = parsed_config["application"]["secret_key"]
+config["FB_APP_ID"] = parsed_config["facebook"]["id"]
+config["FB_APP_NAME"] = parsed_config["facebook"]["name"]
+config["FB_APP_SECRET"] = parsed_config["facebook"]["secret"]
 config["SQLALCHEMY_DATABASE_URI"] = "postgresql://" + parsed_config["database"]["user"] + ":" + parsed_config["database"]["pass"] + "@" + parsed_config["database"]["host"] + "/" + parsed_config["database"]["name"]
 
 app.config.update(config)
 
 
 #Create server (WSGI config)
-server = Server(host="127.0.0.1", port=parsed_config["application"]["port"])
+server = Server(host="0.0.0.0", port=parsed_config["application"]["port"])
 
 
 #Create DB
