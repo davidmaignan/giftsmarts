@@ -1,19 +1,32 @@
-# from app.models.relationships import roles_users
-from app.constants import ROLES
+import pprint
 import bcrypt
 import re
 import datetime
 from app.config.config import db
 from app.config.config import app
 from app.constants import *
+from sqlalchemy.orm import relationship
+
+user_friends = db.Table('user_friends',
+                        db.Column("user_id", db.String, db.ForeignKey("user.id")),
+                        db.Column("friend_id", db.String, db.ForeignKey("user.id"))
+                        )
 
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     profile_url = db.Column(db.String, nullable=False)
     access_token = db.Column(db.String, nullable=False)
     birthday = db.Column(db.Date, nullable=False)
+    friends = relationship("User",
+                           secondary=user_friends,
+                           primaryjoin=id == user_friends.c.user_id,
+                           secondaryjoin=id == user_friends.c.friend_id,
+                           backref="user_friends"
+                           )
+
 
 class UserActions():
     model = User
@@ -31,12 +44,33 @@ class UserActions():
         try:
             birthday = datetime.datetime.strptime(profile['birthday'], '%m/%d/%Y').date()
 
-            new_user = cls.model(id=profile['id'], name=profile['name'], profile_url="", birthday=birthday, access_token=result['access_token'])
+            new_user = cls.model(id=profile['id'],
+                                 name=profile['name'],
+                                 profile_url="",
+                                 birthday=birthday,
+                                 access_token=result['access_token'])
             db.session.add(new_user)
             db.session.commit()
-            return user
+            return new_user
         except Exception:
             return None
+
+
+    @classmethod
+    def add_friends(cls, user, friends):
+        user = UserActions.find_by_id(user['id'])
+
+        for friend in friends:
+            birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
+
+            new_user = cls.model(id=friend['id'],
+                                 name=friend['name'],
+                                 profile_url="",
+                                 birthday=birthday,
+                                 access_token="")
+            user.friends.append(new_user)
+            db.session.commit()
+
 
     @classmethod
     def get_username(cls, user_id):
