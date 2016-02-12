@@ -61,15 +61,17 @@ class UserActions():
         user = UserActions.find_by_id(user['id'])
 
         for friend in friends:
-            birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
 
-            new_user = cls.model(id=friend['id'],
-                                 name=friend['name'],
-                                 profile_url="",
-                                 birthday=birthday,
-                                 access_token="")
-            user.friends.append(new_user)
-            db.session.commit()
+            if not (cls.model.query.filter_by(id=friend['id']).one()):
+                birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
+
+                new_user = cls.model(id=friend['id'],
+                                     name=friend['name'],
+                                     profile_url="",
+                                     birthday=birthday,
+                                     access_token="")
+                user.friends.append(new_user)
+                db.session.commit()
 
 
     @classmethod
