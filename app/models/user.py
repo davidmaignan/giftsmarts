@@ -5,6 +5,7 @@ import datetime
 from app.config.config import db
 from app.config.config import app
 from app.constants import *
+from sqlalchemy import exists
 from sqlalchemy.orm import relationship
 
 user_friends = db.Table('user_friends',
@@ -20,6 +21,10 @@ class User(db.Model):
     profile_url = db.Column(db.String, nullable=False)
     access_token = db.Column(db.String, nullable=False)
     birthday = db.Column(db.Date, nullable=False)
+    posts = db.relationship('Post', backref='user_post',
+                                lazy='dynamic')
+    events = db.relationship('Event', backref='user_event',
+                                lazy='dynamic')
     friends = relationship("User",
                            secondary=user_friends,
                            primaryjoin=id == user_friends.c.user_id,
@@ -61,8 +66,8 @@ class UserActions():
         user = UserActions.find_by_id(user['id'])
 
         for friend in friends:
-
-            if not (cls.model.query.filter_by(id=friend['id']).one()):
+            ret = db.session.query(exists().where(User.id==friend['id'])).scalar()
+            if ret is not True:
                 birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
 
                 new_user = cls.model(id=friend['id'],
