@@ -64,6 +64,7 @@ def index(name="index", *args, **kawrgs):
             graph = GraphAPI(g.user['access_token'])
             args = {'fields' : 'birthday, name, email, posts, likes, books'}
             friends = graph.get_object('me/friends', **args);
+            UserActions.add_friends(g.user, friends['data'])
             return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
         except Exception:
             return redirect(url_for('logout'))
