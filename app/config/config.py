@@ -54,10 +54,10 @@ mail = Mail(app)
 
 # Freeze Model modules so they can be used in the shell
 from app.routes import *
-# from app.models.relationships import *
+from app.models.relationships import *
 from app.models.user import *
-# from app.models.authtoken import *
-# from app.models.useremail import *
-# from app.models.userprofile import *
+from app.models.authtoken import *
+from app.models.useremail import *
+from app.models.userprofile import *
 from app.models.post import *
 from app.models.event import *
