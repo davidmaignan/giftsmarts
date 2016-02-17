@@ -4,6 +4,7 @@ node_modules/
 
 # CSS / JS
 static/css/*.css
+static/css/*.map
 static/js/*.js
 .sass-cache/
 
