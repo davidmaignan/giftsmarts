@@ -76,3 +76,6 @@ target/
 
 # redis
 redis/
+
+# logs
+logs/*\.log
