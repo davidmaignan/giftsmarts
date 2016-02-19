@@ -2,16 +2,15 @@ from flask import Flask
 from flask.ext.mail import Mail
 from flask.ext.script import Server
 from flask.ext.sqlalchemy import SQLAlchemy
+from app.tasks.celery import make_celery
 import os
 import yaml
 
-
-#Initialize Application
+# Initialize Application
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), '../views'))
 app._static_folder = '../../static'
 
-
-#Load Configs
+# Load Configs
 parsed_config = None
 config = {}
 config_path = None
@@ -26,31 +25,34 @@ else:
 with open(config_path, 'r') as stream:
     parsed_config = yaml.load(stream)
 
-
 config["JWT_ALGORITHM"] = 'HS512'
 config["BCRYPT_ROUNDS"] = 12
-#session duration in minutes
+# session duration in minutes
 config["SESSION_DURATION"] = 15
 config["THREADED"] = parsed_config["application"]["threaded"]
 config["SECRET_KEY"] = parsed_config["application"]["secret_key"]
 config["FB_APP_ID"] = parsed_config["facebook"]["id"]
 config["FB_APP_NAME"] = parsed_config["facebook"]["name"]
 config["FB_APP_SECRET"] = parsed_config["facebook"]["secret"]
-config["SQLALCHEMY_DATABASE_URI"] = "postgresql://" + parsed_config["database"]["user"] + ":" + parsed_config["database"]["pass"] + "@" + parsed_config["database"]["host"] + "/" + parsed_config["database"]["name"]
+config["SQLALCHEMY_DATABASE_URI"] = "postgresql://" + parsed_config["database"]["user"] + ":" + \
+                                    parsed_config["database"]["pass"] + "@" + parsed_config["database"]["host"] + "/" + \
+                                    parsed_config["database"]["name"]
+app.config['CELERY_BROKER_URL'] = "redis://localhost:6379"
+app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6379"
 
 app.config.update(config)
 
-
-#Create server (WSGI config)
+# Create server (WSGI config)
 server = Server(host="0.0.0.0", port=parsed_config["application"]["port"])
 
-
-#Create DB
+# Create DB
 db = SQLAlchemy(app)
 
-
-#Create Mail
+# Create Mail
 mail = Mail(app)
+
+# Celery
+celery = make_celery(app)
 
 # Freeze Model modules so they can be used in the shell
 from app.routes import *
@@ -61,3 +63,4 @@ from app.models.useremail import *
 from app.models.userprofile import *
 from app.models.post import *
 from app.models.event import *
+from app.scripts.scripts import *
