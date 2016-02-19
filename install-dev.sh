@@ -22,3 +22,10 @@ cd facebook-sdk
 ../env/bin/python3.4 setup.py install
 cd ..
 rm -rf facebook-sdk
+
+# Redis installation
+curl -O http://download.redis.io/redis-stable.tar.gz
+mkdir redis
+tar xvzf redis-stable.tar.gz -C redis
+cd redis
+make
