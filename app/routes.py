@@ -1,15 +1,13 @@
-from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
-from facebook import get_user_from_cookie, GraphAPI
 import json
 import jwt
 import pprint
+from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+from facebook import get_user_from_cookie, GraphAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
-from app.models.user import UserActions, User
-from app.config.config import app, db
-
-
-
+from app.models.user import UserActions
+from app.config.config import app, db, celery
+from app.tasks import facebook as facebook_task
 
 def not_found():
     return "", 404
@@ -51,6 +49,12 @@ def token_required(f):
     return decorated_function
 
 
+@app.route("/friends/", methods=["GET"])
+def test_task():
+    task3 = facebook_task.get_friends.delay(g.user)
+    return "friend list"
+
+
 @app.route("/", methods=["GET"], defaults={'path': ''})
 @app.route("/#/", methods=["GET"])
 @app.route("/<path:path>/", methods=["GET"])
@@ -63,8 +67,8 @@ def index(name="index", *args, **kawrgs):
         try:
             graph = GraphAPI(g.user['access_token'])
             args = {'fields' : 'birthday, name, email, posts, likes, books'}
-            friends = graph.get_object('me/friends', **args);
-            UserActions.add_friends(g.user, friends['data'])
+            friends = graph.get_object('me/friends', **args)
+
             return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
         except Exception:
             return redirect(url_for('logout'))
