@@ -14,6 +14,12 @@
     "ngstorage": "~0.3.9"
   },
   "dependencies": {
-    "packery": "^1.4.3"
+    "isotope": "2.x",
+    "isotope-cells-by-column": "1.x",
+    "isotope-cells-by-row": "1.x",
+    "isotope-fit-columns": "1.x",
+    "isotope-horizontal": "1.x",
+    "isotope-masonry-horizontal": "1.x",
+    "isotope-packery": "1.x"
   }
 }

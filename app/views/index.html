@@ -1,26 +1,78 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="center">
-    <p class='circle-image'
-       style="background-image: url(https://graph.facebook.com/{{ user['id'] }}/picture?type=large);
-              margin-left: auto; margin-right: auto;">
-    </p>
-    <h3>Hello, {{ user['name'] }}.</h3>
-     <img src="https://graph.facebook.com/{{user['id']}}/picture?type=large" />
-     <a href="#" id="logout">Log out</a>
-     <hr />
 
-    <div id="container">
-        {% for friend in friends['data'] %}
-            <div class="item">
-              <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=large" />
-              <p>{{ friend['name']}}</p>
+<div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <h1 href="{{ url_for('index') }}">GiftSmarts</h1>
+            <img src="https://graph.facebook.com/{{user['id']}}/picture?type=large" class="img-circle" />
+            <h2>{{ user['name'] }}</h2>
+            <p><a href="{{ url_for('test_task') }}" class="btn btn-info btn-sm" id="menu-toggle">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                Refresh my friends list</a></p>
+            <p><a class="btn btn-success" id="logout">Log out</a></p>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>Your friends</h1>
+                        <p>This is the list of friends we have been able to retrieve from your facebook account. Use the filter to show or hide  some on them.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                    <div class="btn-toolbar" role="toolbar" aria-label="...">
+                      <div class="btn-group" role="group" aria-label="Filter">
+                          <button type="button" class="btn btn-default active"> All</button>
+                          <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Family</button>
+                          <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Active</button>
+                          <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Archived</button>
+                        </div>
+                      <div class="btn-group" role="group" aria-label="...">
+                          <div class="input-group input-group-md">
+                          <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+                          <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                        </div>
+                      </div>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </div>
+
+            <hr />
+
+        <section id="main" class="container">
+
+            {% for friend in friends['data'] %}
+                <div class="box">
+                  <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=large" class="img-circle" />
+                  <h4>{{ friend['name']}}</h4>
+                    <p><span class="badge primary">2</span> Presents</p>
+                    <p>
+                        <span class="label label-success"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                        <span class="label label-default"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></span>
+                        <span class="label label-default"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></span>
+                    </p>
+                    <p><a href="{{ url_for('index') }}" class="btn btn-info btn-block">Details</a></p>
+                </div>
+            {% endfor %}
+        </section>
+        <!-- /#page-content-wrapper -->
+
+        </div>
+        <!-- /#wrapper -->
+        </div>
+
+
+<div class="center">
+
     <script>
         document.getElementById('logout').onclick = function() {
-            FB.logout(function(response) { 
+            FB.logout(function(response) {
                 console.log(response);
                 window.location.href = "/logout";
             });
