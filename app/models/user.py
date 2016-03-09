@@ -55,7 +55,8 @@ class FriendRelationshipActions:
 
     @classmethod
     def put(cls, data):
-        relation = cls.model.query.filter_by(id=data['id'], owner_id=data['owner_id'], friend_id=data['friend_id']).one()
+        relation = cls.model.query.filter_by(id=data['id'], owner_id=data['owner_id'],
+                                             friend_id=data['friend_id']).one()
         relation.relation_type = data['relation_type']
         relation.active = data['active'] == '1'
 
@@ -148,25 +149,10 @@ class UserActions:
             except NoResultFound:
                 birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
                 friend_entity = cls.model(id=friend['id'], name=friend['name'], profile_url="",
-                                   birthday=birthday, access_token="")
-                relationship = FriendRelationshipActions.create(user, friend_entity)
-
-
+                                          birthday=birthday, access_token="")
+                FriendRelationshipActions.create(user, friend_entity)
 
             db.session.commit()
-
-            # ret = db.session.query(exists().where(User.id==friend['id'])).scalar()
-            #
-            # if ret is not True:
-            #     birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
-            #
-            #     new_user = cls.model(id=friend['id'],
-            #                          name=friend['name'],
-            #                          profile_url="",
-            #                          birthday=birthday,
-            #                          access_token="")
-            #     user.friends.append(new_user)
-            #     db.session.commit()
 
     @classmethod
     def add_friends_from_csv(cls, row):
