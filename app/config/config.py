@@ -63,7 +63,4 @@ from app.models.useremail import *
 from app.models.userprofile import *
 from app.models.post import *
 from app.models.event import *
-<<<<<<< HEAD
-=======
 from app.scripts.scripts import *
->>>>>>> b82e2790df929b4ddf424b58a4b40a8593f5ad21

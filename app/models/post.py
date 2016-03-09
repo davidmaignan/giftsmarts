@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-from app.config.config import db
-from app.config.config import app
-from app.constants import *
-from sqlalchemy.orm import relationship
-=======
 import arrow
 from app.config.config import db
->>>>>>> b82e2790df929b4ddf424b58a4b40a8593f5ad21
 
 
 class Post(db.Model):
@@ -16,8 +9,6 @@ class Post(db.Model):
     created = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
 
-<<<<<<< HEAD
-=======
 
 class PostActions:
     model = Post
@@ -38,4 +29,3 @@ class PostActions:
             return new_post
         except Exception:
             return None
->>>>>>> b82e2790df929b4ddf424b58a4b40a8593f5ad21
