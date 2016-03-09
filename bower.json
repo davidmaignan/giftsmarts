@@ -11,7 +11,8 @@
     "angular-sanitize": "~1.4.7",
     "jquery": "~2.1.4",
     "moment": "~2.10.6",
-    "ngstorage": "~0.3.9"
+    "ngstorage": "~0.3.9",
+    "bootstrap-sass": "3.3.6"
   },
   "dependencies": {
     "isotope": "2.x",
