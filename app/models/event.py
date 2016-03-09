@@ -1,7 +1,5 @@
+import arrow
 from app.config.config import db
-from app.config.config import app
-from app.constants import *
-from sqlalchemy.orm import relationship
 
 
 class Event(db.Model):
@@ -12,3 +10,22 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
 
+class EventActions:
+    model = Event
+
+    @classmethod
+    def create(cls, event, user):
+        try:
+            start_time = arrow.get(event['start_time']).datetime
+
+            new_event = cls.model(id=event['id'],
+                                  name=event['name'],
+                                  description=event['description'],
+                                  start_time=start_time,
+                                  user_id=user['id']
+                                  )
+            db.session.add(new_event)
+            db.session.commit()
+            return new_event
+        except Exception as detail:
+            return None

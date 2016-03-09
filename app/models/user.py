@@ -1,4 +1,4 @@
-import pprint
+
 import bcrypt
 import re
 import datetime
@@ -33,8 +33,12 @@ class User(db.Model):
                            )
 
 
-class UserActions():
+class UserActions:
     model = User
+
+    @classmethod
+    def find_all(cls):
+        return cls.model.query.all()
 
     @classmethod
     def find_by_id(cls, user_id):
