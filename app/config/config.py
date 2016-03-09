@@ -26,7 +26,7 @@ else:
 with open(config_path, 'r') as stream:
     parsed_config = yaml.load(stream)
 
-
+config["STOPLIST"] = 'data/stoplist.txt'
 config["JWT_ALGORITHM"] = 'HS512'
 config["BCRYPT_ROUNDS"] = 12
 #session duration in minutes
