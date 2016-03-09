@@ -1,6 +1,8 @@
 import json
 import jwt
 import pprint
+import jsonpickle
+import json
 from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
 from facebook import get_user_from_cookie, GraphAPI
 from functools import wraps
@@ -8,6 +10,7 @@ from app.controllers.userauthentication import UserAuthentication
 from app.models.user import UserActions
 from app.config.config import app, db, celery
 from app.tasks import facebook as facebook_task
+from app.utils.ActionsFactory import ActionsFactory
 
 def not_found():
     return "", 404
@@ -46,6 +49,7 @@ def token_required(f):
         resp = make_response(f(*args, **kwargs))
         resp.headers["token"] = "Bearer " + token
         return resp
+
     return decorated_function
 
 
@@ -64,14 +68,14 @@ def index(name="index", *args, **kawrgs):
         return "", 400
 
     if g.user:
-        try:
+        # try:
             graph = GraphAPI(g.user['access_token'])
-            args = {'fields' : 'birthday, name, email, posts, likes, books'}
+            args = {'fields': 'birthday, name, email, posts, likes, books'}
             friends = graph.get_object('me/friends', **args)
 
             return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
-        except Exception:
-            return redirect(url_for('logout'))
+        # except Exception:
+        #     return redirect(url_for('logout'))
 
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
 
@@ -88,9 +92,9 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
 
+
 @app.route("/api/auth/login", methods=["POST"])
 def login(name="login"):
-
     args = get_request_args()
 
     if not "username" in args or not "password" in args:
@@ -109,13 +113,41 @@ def login(name="login"):
 @app.route("/api/user/username", methods=["GET"])
 @token_required
 def username(name="username", token=None):
-
     user_id = jwt.get_payload(token)["sub"]
     username = UserActions.get_username(user_id)
 
     return jsonify(**{
         "username": username
     })
+
+
+@app.route('/v1/api/<string:entity>/', methods=["GET"])
+@app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
+def api_request(entity, id=None):
+    if g.user:
+        repository = ActionsFactory.get_repository(entity)
+        result = repository.filter(g.user['id'], entity_id=id)
+        return jsonpickle.encode(result.all())
+    else:
+        return "not connected"
+
+
+@app.route('/v1/api/<string:entity>/', methods=["PUT"])
+def api_request_put(entity):
+    if g.user:
+        repository = ActionsFactory.get_repository(entity)
+
+        data = jsonpickle.decode(request.data.decode('utf-8'))
+
+        result = repository.put(data['data'])
+
+        # entity_dict = data['data']
+        #  user = UserActions.find_by_id(entity_dict['user_id'])
+
+        return "api_request success: " + str(result) + str(data['data'])
+
+    else:
+        return "not connected"
 
 
 @app.before_request
@@ -135,8 +167,8 @@ def check_user_logged_in():
             args = {'fields' : 'birthday, name, email'}
             profile = graph.get_object('me', **args);
 
-            user = UserActions.create_user(profile, result)
-           
+            UserActions.create_user(profile, result)
+
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
 
@@ -147,3 +179,4 @@ def check_user_logged_in():
 
     db.session.commit()
     g.user = session.get('user', None)
+
