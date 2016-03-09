@@ -2,6 +2,8 @@ from app.config.config import app, db, server
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 from app.manager.seed import seed
+from app.manager.test import test
+
 
 migrate = Migrate(app, db)
 
@@ -14,3 +16,5 @@ manager.add_command("runserver", server)
 manager.add_command('db', MigrateCommand)
 
 manager.add_command('seed', seed)
+
+manager.add_command('test', test)
