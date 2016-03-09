@@ -1,16 +1,18 @@
 import bcrypt
 import re
 import datetime
+import pprint
 from app.config.config import db
 from app.config.config import app
 from app.constants import *
-from sqlalchemy import exists
-from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm.exc import NoResultFound
 
-user_friends = db.Table('user_friends',
-                        db.Column("user_id", db.String, db.ForeignKey("user.id")),
-                        db.Column("friend_id", db.String, db.ForeignKey("user.id"))
-                        )
+
+class FriendRelationshipType(db.Model):
+    __tablename__ = 'friend_relationship_type'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False, unique=True)
 
 
 class User(db.Model):
@@ -21,15 +23,59 @@ class User(db.Model):
     access_token = db.Column(db.String, nullable=False)
     birthday = db.Column(db.Date, nullable=False)
     posts = db.relationship('Post', backref='user_post',
-                                lazy='dynamic')
+                            lazy='dynamic')
     events = db.relationship('Event', backref='user_event',
-                                lazy='dynamic')
-    friends = relationship("User",
-                           secondary=user_friends,
-                           primaryjoin=id == user_friends.c.user_id,
-                           secondaryjoin=id == user_friends.c.friend_id,
-                           backref="user_friends"
-                           )
+                             lazy='dynamic')
+
+    to_friends = association_proxy('to_relations', 'to_friend')
+    from_owners = association_proxy('from_relations', 'from_owner')
+
+
+class FriendRelationship(db.Model):
+    __tablename__ = 'friend_relationships'
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.String, db.ForeignKey('user.id'))
+    friend_id = db.Column(db.String, db.ForeignKey('user.id'))
+    relation_type = db.Column(db.Integer, db.ForeignKey('friend_relationship_type.id'), nullable=True)
+    active = db.Column(db.Boolean, default=True)
+    from_owner = db.relationship(User, primaryjoin=(owner_id == User.id), backref='to_relations')
+    to_friend = db.relationship(User, primaryjoin=(friend_id == User.id), backref='from_relations')
+
+
+class FriendRelationshipActions:
+    model = FriendRelationship
+
+    @classmethod
+    def create(cls, user, friend):
+        relationship = FriendRelationship();
+        relationship.from_owner = user;
+        relationship.to_friend = friend;
+        db.session.add(relationship)
+        return relationship
+
+    @classmethod
+    def put(cls, data):
+        relation = cls.model.query.filter_by(id=data['id'], owner_id=data['owner_id'],
+                                             friend_id=data['friend_id']).one()
+        relation.relation_type = data['relation_type']
+        relation.active = data['active'] == '1'
+
+        db.session.commit()
+
+        return relation
+
+
+class FriendRelationShipTypeActions:
+    model = FriendRelationshipType
+
+    @classmethod
+    def create(cls, name):
+        try:
+            new_user = cls.model(name=name)
+            db.session.add(new_user)
+            db.session.merge()
+        except Exception as e:
+            return None
 
 
 class UserActions:
@@ -48,39 +94,76 @@ class UserActions:
             return None
 
     @classmethod
-    def create_user(cls, profile, result):
+    def create_user_from_csv(cls, row):
         try:
-            birthday = datetime.datetime.strptime(profile['birthday'], '%m/%d/%Y').date()
+            # id,name,profile_url,access_token,birthday
+            birthday = datetime.datetime.strptime(row[4], '%Y-%m-%d').date()
 
-            new_user = cls.model(id=profile['id'],
-                                 name=profile['name'],
-                                 profile_url="",
-                                 birthday=birthday,
-                                 access_token=result['access_token'])
+            new_user = cls.model(id=row[0],
+                                 name=row[1],
+                                 profile_url=row[2],
+                                 access_token=row[3],
+                                 birthday=birthday)
             db.session.add(new_user)
             db.session.commit()
             return new_user
-        except Exception:
+        except Exception as e:
+            pprint.pprint(e)
             return None
 
+    @classmethod
+    def create(cls, profile):
+        birthday = datetime.datetime.strptime(profile['birthday'], '%m/%d/%Y').date()
+
+        new_user = cls.model(id=profile['id'],
+                             name=profile['name'],
+                             profile_url="",
+                             birthday=birthday,
+                             access_token="")
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
+
+    @classmethod
+    def create_user(cls, profile, result):
+        birthday = datetime.datetime.strptime(profile['birthday'], '%m/%d/%Y').date()
+
+        new_user = cls.model(id=profile['id'],
+                             name=profile['name'],
+                             profile_url="",
+                             birthday=birthday,
+                             access_token=result['access_token'])
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
 
     @classmethod
     def add_friends(cls, user, friends):
         user = UserActions.find_by_id(user['id'])
 
         for friend in friends:
-            ret = db.session.query(exists().where(User.id==friend['id'])).scalar()
-            if ret is not True:
+
+            try:
+                friend_entity = cls.model.query.filter_by(id=friend['id']).one()
+                relationship = FriendRelationshipActions.create(user, friend_entity)
+            except NoResultFound:
                 birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
+                friend_entity = cls.model(id=friend['id'], name=friend['name'], profile_url="",
+                                          birthday=birthday, access_token="")
+                FriendRelationshipActions.create(user, friend_entity)
 
-                new_user = cls.model(id=friend['id'],
-                                     name=friend['name'],
-                                     profile_url="",
-                                     birthday=birthday,
-                                     access_token="")
-                user.friends.append(new_user)
-                db.session.commit()
+            db.session.commit()
 
+    @classmethod
+    def add_friends_from_csv(cls, row):
+        try:
+            user = UserActions.find_by_id(row[0])
+            friend = UserActions.find_by_id(row[1])
+
+            user.friends.append(friend)
+            db.session.commit()
+        except Exception as e:
+            print(e)
 
     @classmethod
     def get_username(cls, user_id):
