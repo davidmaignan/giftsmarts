@@ -67,7 +67,8 @@ def index(name="index", *args, **kawrgs):
         try:
             graph = GraphAPI(g.user['access_token'])
             args = {'fields' : 'birthday, name, email, posts, likes, books'}
-            friends = graph.get_object('me/friends', **args)
+            friends = graph.get_object('me/friends', **args);
+            UserActions.add_friends(g.user, friends['data'])
 
             return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
         except Exception:
@@ -136,7 +137,7 @@ def check_user_logged_in():
             profile = graph.get_object('me', **args);
 
             user = UserActions.create_user(profile, result)
-           
+
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
 
