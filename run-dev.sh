@@ -1,9 +1,10 @@
 #!/bin/bash
 #
+
 PID=$(pgrep -f "runserver|celery|redis")
 for i in ${PID};
 do
-    echo ${i}
+    echo kill: ${i}
     kill ${i}
 done
 
