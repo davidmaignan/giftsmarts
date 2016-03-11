@@ -10,7 +10,6 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
 
-
 class EventActions:
     model = Event
 

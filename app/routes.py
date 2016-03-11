@@ -70,8 +70,8 @@ def index(name="index", *args, **kawrgs):
     if g.user:
         # try:
             graph = GraphAPI(g.user['access_token'])
-            args = {'fields': 'birthday, name, email, posts, likes, books'}
-            friends = graph.get_object('me/friends', **args)
+            args = {'fields' : 'birthday, name, email, posts, likes, books'}
+            friends = graph.get_object('me/friends', **args);
 
             for friend in friends['data']:
                 UserActions.add_friend(friend)
@@ -172,7 +172,6 @@ def check_user_logged_in():
             graph = GraphAPI(result['access_token'])
             args = {'fields' : 'birthday, name, email'}
             profile = graph.get_object('me', **args);
-
             UserActions.create_user(profile, result)
 
         elif user.access_token != result['access_token']:

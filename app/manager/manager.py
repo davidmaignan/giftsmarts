@@ -6,6 +6,8 @@ from app.manager.load_fixtures import LoadFixtures
 from app.manager.add_posts import FacebookPosts
 from app.manager.facebook import FacebookData
 from app.manager.seed import seed
+from app.manager.test import test
+
 
 migrate = Migrate(app, db)
 
@@ -26,3 +28,5 @@ manager.add_command('addPosts', FacebookPosts)
 manager.add_command('getFixtures', FacebookData)
 
 manager.add_command('seed', seed)
+
+manager.add_command('test', test)
