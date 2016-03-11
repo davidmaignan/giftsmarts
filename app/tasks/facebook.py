@@ -44,6 +44,5 @@ def get_friend_post(user, friend):
     posts = graph.get_connections(friend['id'], 'posts')
     for post in posts['data']:
         post = PostActions.create(post, friend)
-        pprint.pprint(post)
 
     return "get friend post"

@@ -1,3 +1,4 @@
+from builtins import classmethod, Exception, print
 import bcrypt
 import re
 import datetime
@@ -47,11 +48,17 @@ class FriendRelationshipActions:
 
     @classmethod
     def create(cls, user, friend):
-        relationship = FriendRelationship();
-        relationship.from_owner = user;
-        relationship.to_friend = friend;
+        relationship = FriendRelationship()
+        relationship.from_owner = user
+        relationship.to_friend = friend
         db.session.add(relationship)
         return relationship
+
+    @classmethod
+    def create_from_csv(cls, row):
+        relationship = FriendRelationship(id=row[0], owner_id=row[1], friend_id=row[2])
+        db.session.add(relationship)
+        db.session.commit()
 
     @classmethod
     def put(cls, data):
@@ -59,9 +66,7 @@ class FriendRelationshipActions:
                                              friend_id=data['friend_id']).one()
         relation.relation_type = data['relation_type']
         relation.active = data['active'] == '1'
-
         db.session.commit()
-
         return relation
 
 
@@ -142,10 +147,9 @@ class UserActions:
         user = UserActions.find_by_id(user['id'])
 
         for friend in friends:
-
             try:
                 friend_entity = cls.model.query.filter_by(id=friend['id']).one()
-                relationship = FriendRelationshipActions.create(user, friend_entity)
+                FriendRelationshipActions.create(user, friend_entity)
             except NoResultFound:
                 birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
                 friend_entity = cls.model(id=friend['id'], name=friend['name'], profile_url="",

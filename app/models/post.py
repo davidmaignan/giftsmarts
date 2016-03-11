@@ -34,18 +34,18 @@ class PostActions:
 
     @classmethod
     def create_from_csv(cls, row):
+        test = row
         try:
             # "id","story","created","user_id"
-            # created = arrow.get(row[2], 'YYYY-MM-DD HH:mm:ss').datetime
+            created = arrow.get(row[2], 'YYYY-MM-DD HH:mm:ss').datetime
 
             new_post = cls.model(id=row[0],
                                  story=row[1],
-                                 created=datetime.datetime.now(),
+                                 created=created,
                                  user_id=row[3]
                                  )
             db.session.add(new_post)
-            db.session.merge()
+            db.session.commit()
             return new_post
         except Exception as e:
-            pprint.pprint(e)
             return None
