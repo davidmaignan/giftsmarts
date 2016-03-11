@@ -14,15 +14,10 @@ class FacebookData(Command):
         args = {'fields' : 'birthday, name, email'}
         friends = graph.get_object('me/friends', **args)
 
-        # print(len(friends))
         for friend in friends['data']:
             UserActions.create(friend)
             posts = graph.get_connections(friend['id'], 'posts')
             for post in posts['data']:
                 post = PostActions.create(post, friend)
                 print(post)
-        # UserActions.add_friends(user, friends['data'])
-
-
-
         pass
