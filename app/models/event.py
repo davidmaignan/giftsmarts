@@ -29,3 +29,9 @@ class EventActions:
             return new_event
         except Exception as detail:
             return None
+
+    @classmethod
+    def create_from_csv(cls, row):
+        event = Event(id=row[0], name=row[1], description=row[2], start_time=arrow.get(row[3]).datetime, user_id=row[4])
+        db.session.add(event)
+        db.session.commit()

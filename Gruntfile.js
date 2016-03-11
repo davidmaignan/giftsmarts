@@ -26,6 +26,27 @@ module.exports = function(grunt) {
                         'bower_components/angular-route/angular-route.js',
                         'bower_components/ngstorage/ngStorage.js',
                         'bower_components/packery/dist/packery.pkgd.js',
+                        // isotope
+                          'bower_components/isotope/js/layout-mode.js',
+                          'bower_components/isotope/js/item.js',
+                          'bower_components/isotope/js/isotope.js',
+                          'bower_components/isotope/js/layout-modes/fit-rows.js',
+                          'bower_components/isotope/js/layout-modes/vertical.js',
+                          // isotope masonry
+                          'bower_components/masonry/masonry.js',
+                          'bower_components/isotope/js/layout-modes/masonry.js',
+                          // layout modes
+                          'bower_components/isotope-cells-by-column/cells-by-column.js',
+                          'bower_components/isotope-cells-by-row/cells-by-row.js',
+                          'bower_components/isotope-fit-columns/fit-columns.js',
+                          'bower_components/isotope-horizontal/horizontal.js',
+                          'bower_components/isotope-masonry-horizontal/masonry-horizontal.js',
+                          // isotope packery
+                          'bower_components/packery/js/rect.js',
+                          'bower_components/packery/js/packer.js',
+                          'bower_components/packery/js/item.js',
+                          'bower_components/packery/js/packery.js',
+                          'bower_components/isotope-packery/packery-mode.js',
                         'app/assets/js/app.js',
                         'app/assets/js/controllers/*.js',
                         'app/assets/js/directives/*.js',

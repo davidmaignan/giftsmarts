@@ -9,7 +9,6 @@
     <meta property="fb:app_id" content="{{ app_id }}" />
 
     <title>Gift smarts</title>
-
     <!-- Style -->
     <!--[if IE]>
       <script type="text/javascript">
@@ -44,9 +43,7 @@
         }(document, 'script', 'facebook-jssdk'));
     </script>
 
-     <div class="container">
-        {% block content %} {% endblock %}
-    </div>
+    {% block content %}{% endblock %}
 
     <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
 </body>

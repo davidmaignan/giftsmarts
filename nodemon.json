@@ -1,0 +1,9 @@
+{
+  "verbose": true,
+  "watch": ["app/assets/*"],
+  "ext": "js scss",
+  "events": {
+    "restart": "grunt"
+  }
+}
+
