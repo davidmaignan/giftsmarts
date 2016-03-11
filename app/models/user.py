@@ -8,6 +8,7 @@ from app.config.config import app
 from app.constants import *
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import exists
 
 
 class FriendRelationshipType(db.Model):
@@ -47,16 +48,23 @@ class FriendRelationshipActions:
     model = FriendRelationship
 
     @classmethod
+    def find_all_by_user(cls, user):
+        return cls.model.query.filter_by(owner_id=user['id']).all()
+
+    @classmethod
     def create(cls, user, friend):
-        relationship = FriendRelationship()
-        relationship.from_owner = user
-        relationship.to_friend = friend
-        db.session.add(relationship)
-        return relationship
+        try:
+            relationship = FriendRelationship()
+            relationship.from_owner = user
+            relationship.to_friend = friend
+            db.session.add(relationship)
+            return relationship
+        except Exception:
+            return None
 
     @classmethod
     def create_from_csv(cls, row):
-        relationship = FriendRelationship(id=row[0], owner_id=row[1], friend_id=row[2])
+        relationship = FriendRelationship(id=row[0], owner_id=row[1], friend_id=row[2], relation_type=row[3])
         db.session.add(relationship)
         db.session.commit()
 
@@ -156,6 +164,18 @@ class UserActions:
                                           birthday=birthday, access_token="")
                 FriendRelationshipActions.create(user, friend_entity)
 
+            db.session.commit()
+
+    @classmethod
+    def add_friend(cls, friend):
+        if db.session.query(exists().where(User.id == friend['id'])).scalar() is not True:
+            birthday = datetime.datetime.strptime(friend['birthday'], '%m/%d/%Y').date()
+            new_user = cls.model(id=friend['id'],
+                                 name=friend['name'],
+                                 profile_url="",
+                                 birthday=birthday,
+                                 access_token="")
+            db.session.add(new_user)
             db.session.commit()
 
     @classmethod

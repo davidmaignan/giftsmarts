@@ -7,7 +7,7 @@ from flask import g, render_template, request, jsonify, make_response, session, 
 from facebook import get_user_from_cookie, GraphAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
-from app.models.user import UserActions
+from app.models.user import UserActions, FriendRelationshipActions
 from app.config.config import app, db, celery
 from app.tasks import facebook as facebook_task
 from app.utils.ActionsFactory import ActionsFactory
@@ -73,7 +73,13 @@ def index(name="index", *args, **kawrgs):
             args = {'fields': 'birthday, name, email, posts, likes, books'}
             friends = graph.get_object('me/friends', **args)
 
-            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
+            for friend in friends['data']:
+                UserActions.add_friend(friend)
+                FriendRelationshipActions.create(g.user, friend)
+
+            relations = FriendRelationshipActions.find_all_by_user(g.user)
+
+            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, relations=relations)
         # except Exception:
         #     return redirect(url_for('logout'))
 

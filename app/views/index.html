@@ -29,8 +29,11 @@
                             <button type="button" class="btn btn-default" data-filter=".family"><span class="glyphicon glyphicon-user"
                                                                                 aria-hidden="true"></span> Family
                             </button>
-                            <button type="button" class="btn btn-default" data-filter=".active"><span class="glyphicon glyphicon-heart"
-                                                                                aria-hidden="true"></span> Active
+                             <button type="button" class="btn btn-default" data-filter=".close_friend"><span class="glyphicon glyphicon-heart"
+                                                                                aria-hidden="true"></span> Close friends
+                            </button>
+                            <button type="button" class="btn btn-default" data-filter=".acquaintance"><span class="glyphicon glyphicon-heart"
+                                                                                aria-hidden="true"></span> Acquaintance
                             </button>
                             <button type="button" class="btn btn-default" data-filter=".archived"><span class="glyphicon glyphicon-ban-circle"
                                                                                 aria-hidden="true"></span> Archived
@@ -51,17 +54,29 @@
             <hr/>
 
             <section id="main" class="container grid">
-                {% for friend in friends['data'] %}
-                <div class="box grid-item family">
-                    <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=large" class="img-circle"/>
-                    <h4>{{ friend['name']}}</h4>
+                {% for relation in relations %}
+                <div class="box grid-item
+                    {% if relation.relation_type == 1 %}
+                        family
+                    {% elif relation.relation_type == 2 %}
+                        close_friend
+                    {% else %}
+                        acquaintance
+                    {% endif %}
+
+                    {% if relation.active == 0 %}
+                        archived
+                    {% endif %}
+                ">
+                    <img src="https://graph.facebook.com/{{relation.friend_id}}/picture?type=large" class="img-circle"/>
+                    <h4>{{ relation.to_friend.name }} - {{ relation.active }} {{ relation.relation_type }} </h4>
                     <p><span class="badge primary">2</span> Presents</p>
                     <p>
-                        <span class="label label-success"><span class="glyphicon glyphicon-user"
+                        <span class="label {% if relation.relation_type == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-user"
                                                                 aria-hidden="true"></span></span>
-                        <span class="label label-default"><span class="glyphicon glyphicon-heart"
+                        <span class="label {% if relation.relation_type == 2 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-heart"
                                                                 aria-hidden="true"></span></span>
-                        <span class="label label-default"><span class="glyphicon glyphicon-ban-circle"
+                        <span class="label {% if relation.active == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-ban-circle"
                                                                 aria-hidden="true"></span></span>
                     </p>
                     <p><a href="{{ url_for('index') }}" class="btn btn-info btn-block">Details</a></p>
