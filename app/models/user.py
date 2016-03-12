@@ -9,6 +9,8 @@ from app.constants import *
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import exists
+from sqlalchemy.orm import relationship
+from app.models.category import *
 
 
 class FriendRelationshipType(db.Model):
@@ -31,6 +33,7 @@ class User(db.Model):
 
     to_friends = association_proxy('to_relations', 'to_friend')
     from_owners = association_proxy('from_relations', 'from_owner')
+    categories = relationship("Category", secondary=user_categories)
 
 
 class FriendRelationship(db.Model):
@@ -93,6 +96,11 @@ class FriendRelationShipTypeActions:
 
 class UserActions:
     model = User
+
+    @classmethod
+    def add_category(cls, user, category):
+        user.categories.append(category)
+        db.session.commit()
 
     @classmethod
     def find_all(cls):
