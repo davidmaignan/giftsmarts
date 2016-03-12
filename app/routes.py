@@ -88,9 +88,11 @@ def index(name="index", *args, **kawrgs):
 
 @app.route("/friend/<string:friend_id>/")
 def friend_profile_page(friend_id):
+
+    user = UserActions.find_by_id(g.user['id'])
     friend = UserActions.find_by_id(str(friend_id))
 
-    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=g.user, friend=friend)
+    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend)
 
 @app.route("/robots.txt")
 def robots():
