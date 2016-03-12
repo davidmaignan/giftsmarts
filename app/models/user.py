@@ -53,19 +53,18 @@ class FriendRelationshipActions:
 
     @classmethod
     def create(cls, user, friend):
-        print(friend)
-        try:
+        if db.session.query(exists().where(FriendRelationship.owner_id == user['id'])
+                                    .where(FriendRelationship.friend_id == friend['id'])).scalar() is not True:
             relationship = FriendRelationship()
             relationship.owner_id = user['id']
             relationship.friend_id = friend['id']
             db.session.add(relationship)
+            db.session.commit()
             return relationship
-        except Exception as e:
-            return None
 
     @classmethod
     def create_from_csv(cls, row):
-        relationship = FriendRelationship(id=row[0], owner_id=row[1], friend_id=row[2], relation_type=row[3])
+        relationship = FriendRelationship(owner_id=row[0], friend_id=row[1], relation_type=row[2])
         db.session.add(relationship)
         db.session.commit()
 
