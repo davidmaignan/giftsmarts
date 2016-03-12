@@ -27,19 +27,33 @@
                     <a href="#" class="btn btn-default btn-xs btn-block">Refresh</a>
                 </div>
                 <div class="col-lg-8">
-                    <p>Birthday: {{ friend.birthday }}</p>
-                    <p>Relationship: Family</p>
-                    <p>Category: 'Apparel','Appliances','ArtsAndCrafts','Automotive', 'Baby','Beauty','Blended','Books','Classical','Collectibles','DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</p>
-                    <p>Keywords: 'DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</p>
-                </div>
+                    <dl class="dl-horizontal">
+                        <dt>Birthday</dt>
+                        <dd>{{ friend.birthday }}</dd>
+                        <dt>Relationship</dt>
+                        <dd>Family</dd>
+                        <dt>Category</dt>
+                        <dd>'Apparel','Appliances','ArtsAndCrafts','Automotive', 'Baby','Beauty','Blended','Books','Classical','Collectibles','DVD'</dd>
+                        <dt>Keywords: </dt>
+                        <dd>'DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</dd>
+                    </dl>
+                 </div>
             </div>
 
             <hr/>
 
             <section id="main" class="container grid">
-                {% for value in [1,2,3,4,5,6] %}
+                {% for value in range(17) %}
                 <div class="box grid-item">
-                    <h4>Product name</h4>
+                    <img src="#" class="img-thumbnail"/>
+                    <h3>Product name</h3>
+                    <p>description of the product</p>
+                    <p>category, keyword 1, keyword 2</p>
+                    <p>Price: <strong>$ {{ (12.34 * value) |round(2, 'floor') }}</strong></p>
+                    <p>
+                        <a href="#" class="btn btn-warning">Regject</a>
+                        <a href="#" class="btn btn-success">Save</a>
+                    </p>
 
                 </div>
                 {% endfor %}
