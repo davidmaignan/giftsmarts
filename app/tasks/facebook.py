@@ -5,11 +5,6 @@ from app.models.event import EventActions
 from app.models.post import PostActions
 from facebook import GraphAPI
 
-@celery.task
-def add(x, y):
-    # pprint.pprint("debugging task: " + str(x + y))
-    return x + y
-
 
 @celery.task
 def get_friends(user):

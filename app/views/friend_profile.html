@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <h1 href="{{ url_for('index') }}">GiftSmarts</h1>
+        <img src="https://graph.facebook.com/{{user['id']}}/picture?type=large" class="img-circle"/>
+        <h2>{{ user['name'] }}</h2>
+        <p><a href="{{ url_for('get_facebook_friends_data') }}" class="btn btn-info btn-sm" id="menu-toggle">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+            Refresh my friends list</a></p>
+        <p><a class="btn btn-success" id="logout">Log out</a></p>
+    </div>
+
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1>{{ friend.name }}</h1>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <img src="https://graph.facebook.com/{{friend.id}}/picture?type=large" class="img-thumbnail block"/>
+                    <hr />
+                    <a href="#" class="btn btn-default btn-xs btn-block">Refresh</a>
+                </div>
+                <div class="col-lg-8">
+                    <p>Birthday: {{ friend.birthday }}</p>
+                    <p>Relationship: Family</p>
+                    <p>Category: 'Apparel','Appliances','ArtsAndCrafts','Automotive', 'Baby','Beauty','Blended','Books','Classical','Collectibles','DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</p>
+                    <p>Keywords: 'DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</p>
+                </div>
+            </div>
+
+            <hr/>
+
+            <section id="main" class="container grid">
+                {% for value in [1,2,3,4,5,6] %}
+                <div class="box grid-item">
+                    <h4>Product name</h4>
+
+                </div>
+                {% endfor %}
+            </section>
+
+        </div>
+        <!-- /#wrapper -->
+    </div>
+
+
+    <div class="center">
+
+        <script>
+        document.getElementById('logout').onclick = function() {
+            FB.logout(function(response) {
+                console.log(response);
+                window.location.href = "/logout";
+            });
+        };
+
+        </script>
+    </div>
+    {% endblock %}

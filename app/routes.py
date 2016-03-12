@@ -53,10 +53,10 @@ def token_required(f):
     return decorated_function
 
 
-@app.route("/friends/", methods=["GET"])
-def test_task():
-    task3 = facebook_task.get_friends.delay(g.user)
-    return "friend list"
+@app.route("/facebook_friends_data/", methods=["GET"])
+def get_facebook_friends_data():
+    facebook_task.get_friends.delay(g.user)
+    return redirect(url_for('index'))
 
 
 @app.route("/", methods=["GET"], defaults={'path': ''})
@@ -85,6 +85,12 @@ def index(name="index", *args, **kawrgs):
 
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
 
+
+@app.route("/friend/<string:friend_id>/")
+def friend_profile_page(friend_id):
+    friend = UserActions.find_by_id(str(friend_id))
+
+    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=g.user, friend=friend)
 
 @app.route("/robots.txt")
 def robots():
