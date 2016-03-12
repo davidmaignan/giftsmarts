@@ -72,12 +72,12 @@
                     <h4>{{ relation.to_friend.name }} - {{ relation.active }} {{ relation.relation_type }} </h4>
                     <p><span class="badge primary">2</span> Presents</p>
                     <p>
-                        <span class="label {% if relation.relation_type == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-user"
-                                                                aria-hidden="true"></span></span>
-                        <span class="label {% if relation.relation_type == 2 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-heart"
-                                                                aria-hidden="true"></span></span>
-                        <span class="label {% if relation.active == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-ban-circle"
-                                                                aria-hidden="true"></span></span>
+                        <a class="label {% if relation.relation_type == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-user"
+                                                                aria-hidden="true"></span></a>
+                        <a class="label {% if relation.relation_type == 2 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-heart"
+                                                                aria-hidden="true"></span></a>
+                        <a class="label {% if relation.active == 1 %}label-default {% else %} label-success {% endif %}"><span class="glyphicon glyphicon-ban-circle"
+                                                                aria-hidden="true"></span></a>
                     </p>
                     <p><a href="{{ url_for('index') }}" class="btn btn-info btn-block">Details</a></p>
                 </div>
