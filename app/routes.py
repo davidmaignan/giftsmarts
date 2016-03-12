@@ -70,7 +70,7 @@ def index(name="index", *args, **kawrgs):
     if g.user:
         # try:
             graph = GraphAPI(g.user['access_token'])
-            args = {'fields' : 'birthday, name, email, posts, likes, books'}
+            args = {'fields' : 'birthday, name, email'}
             friends = graph.get_object('me/friends', **args);
 
             for friend in friends['data']:

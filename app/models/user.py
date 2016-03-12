@@ -53,13 +53,14 @@ class FriendRelationshipActions:
 
     @classmethod
     def create(cls, user, friend):
+        print(friend)
         try:
             relationship = FriendRelationship()
-            relationship.from_owner = user
-            relationship.to_friend = friend
+            relationship.owner_id = user['id']
+            relationship.friend_id = friend['id']
             db.session.add(relationship)
             return relationship
-        except Exception:
+        except Exception as e:
             return None
 
     @classmethod
