@@ -5,12 +5,14 @@ import jsonpickle
 import json
 from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
 from facebook import get_user_from_cookie, GraphAPI
+from amazon.api import AmazonAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
 from app.models.user import UserActions, FriendRelationshipActions
 from app.config.config import app, db, celery
 from app.tasks import facebook as facebook_task
 from app.utils.ActionsFactory import ActionsFactory
+
 
 def not_found():
     return "", 404
@@ -57,6 +59,21 @@ def token_required(f):
 def get_facebook_friends_data():
     facebook_task.get_friends.delay(g.user)
     return redirect(url_for('index'))
+
+
+@app.route("/amazon/", methods=["GET"])
+def find_amazon_product():
+    amazon = AmazonAPI(app.config['AMAZON_ACCESS_KEY'],
+                       app.config['AMAZON_SECRET_KEY'],
+                       app.config['AMAZON_ASSOC_TAG'])
+    #
+    products = amazon.search(Keywords='Star Wars', SearchIndex='Books')
+    #
+    # for product in products:
+    #     pprint.pprint(product.title)
+    #
+    # pprint.pprint(product.title)
+    return render_template('amazon.html', app_id=app.config["FB_APP_ID"], user=g.user, products=products)
 
 
 @app.route("/", methods=["GET"], defaults={'path': ''})
@@ -178,10 +195,9 @@ def check_user_logged_in():
 
         if not user:
             graph = GraphAPI(result['access_token'])
-            args = {'fields' : 'birthday, name, email'}
+            args = {'fields': 'birthday, name, email'}
             profile = graph.get_object('me', **args);
             UserActions.create_user(profile, result)
-
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
 

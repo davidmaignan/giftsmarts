@@ -40,8 +40,17 @@ config["FB_APP_SECRET"] = parsed_config["facebook"]["secret"]
 config["SQLALCHEMY_DATABASE_URI"] = "postgresql://" + parsed_config["database"]["user"] + ":" + \
                                     parsed_config["database"]["pass"] + "@" + parsed_config["database"]["host"] + "/" + \
                                     parsed_config["database"]["name"]
-app.config['CELERY_BROKER_URL'] = "redis://localhost:6379"
-app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6379"
+app.config['CELERY_BROKER_URL'] = "redis://" \
+                                  + parsed_config['redis']['broker_url']['host'] \
+                                  + ":" \
+                                  + str(parsed_config['redis']['broker_url']['port'])
+app.config['CELERY_RESULT_BACKEND'] = "redis://" \
+                                      + parsed_config['redis']['result_backend']['host'] \
+                                      + ":" \
+                                      + str(parsed_config['redis']['result_backend']['port'])
+app.config['AMAZON_ACCESS_KEY'] = parsed_config['amazon']['access_key']
+app.config['AMAZON_SECRET_KEY'] = parsed_config['amazon']['secret_key']
+app.config['AMAZON_ASSOC_TAG'] = parsed_config['amazon']['assoc_tag']
 
 app.config.update(config)
 

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="center">
+    <p class='circle-image'
+       style="background-image: url(https://graph.facebook.com/{{ user['id'] }}/picture?type=large);
+              margin-left: auto; margin-right: auto;">
+    </p>
+    <h3>Hello, {{ user['name'] }}.</h3>
+     <img src="https://graph.facebook.com/{{user['id']}}/picture?type=large" />
+     <a href="#" id="logout">Log out</a>
+     <hr />
+
+    <div id="container">
+        {% for product in products %}
+            <div class="item">
+                <img src="{{ product.large_image_url }}" title="{{ product.title }}" />
+                <h4>{{ product.title }}</h4>
+                <p>{{ product.features }}</p>
+                <p>{{ product.price_and_currency }}</p>
+                <!--<p>{{ product.editorial_review | safe }}</p>-->
+
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        document.getElementById('logout').onclick = function() {
+            FB.logout(function(response) { 
+                console.log(response);
+                window.location.href = "/logout";
+            });
+        };
+    </script>
+</div>
+{% endblock %}
