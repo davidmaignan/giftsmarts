@@ -10,7 +10,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import exists
 from sqlalchemy.orm import relationship
-from app.models.category import *
+from app.models.category import Category, user_categories
+from app.models.amazon import Product, user_products
 
 
 class FriendRelationshipType(db.Model):
@@ -34,6 +35,7 @@ class User(db.Model):
     to_friends = association_proxy('to_relations', 'to_friend')
     from_owners = association_proxy('from_relations', 'from_owner')
     categories = relationship("Category", secondary=user_categories)
+    products = relationship("Product", secondary=user_products)
 
 
 class FriendRelationship(db.Model):
