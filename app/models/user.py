@@ -100,6 +100,11 @@ class UserActions:
     model = User
 
     @classmethod
+    def add_product(cls, user, product):
+        user.products.append(product)
+        db.session.commit()
+
+    @classmethod
     def add_category(cls, user, category):
         user.categories.append(category)
         db.session.commit()
