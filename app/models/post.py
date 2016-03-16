@@ -16,7 +16,7 @@ class PostActions:
     model = Post
 
     @classmethod
-    def create(cls, post, user):
+    def create(cls, post, user_id):
         try:
             created = arrow.get(post['created_time']).datetime
             story = post['story'] if ('story' in post.keys()) else post['message']
@@ -24,7 +24,7 @@ class PostActions:
             new_post = cls.model(id=post['id'],
                                  story=story,
                                  created=created,
-                                 user_id=user['id']
+                                 user_id=user_id
                                  )
             db.session.add(new_post)
             db.session.commit()
