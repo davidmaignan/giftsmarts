@@ -22,5 +22,4 @@ manager.add_command('addPosts', FacebookPosts)
 manager.add_command('getFixtures', FacebookData)
 manager.add_command('seed', seed)
 manager.add_command('test', test)
-manager.add_command('amazon', TestAmazon)
 
