@@ -13,9 +13,9 @@
 
         <div>
             {% for friend in user.to_friends %}
-                <a href="{{ url_for('friend_profile_page', friend_id=friend.id) }}">
-                    <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small" style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
-                </a>
+            <a href="{{ url_for('friend_profile_page', friend_id=friend.id) }}">
+                <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small" style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
+            </a>
             {% endfor %}
         </div>
 
@@ -43,25 +43,36 @@
                         <dt>Category</dt>
                         <dd style="line-height: 25px;">
                             {%for category in friend.categories %}
-                                <a href="#" class="label label-default">{{ category.name }}</a>
+                            <a href="#" class="label label-default">{{ category.name }}</a>
                             {% endfor %}
                         </dd>
                         <dt>Keywords: </dt>
                         <dd>'DVD','DigitalMusic','Electronics', 'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry', 'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous', 'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware', 'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video', 'VideoGames','Watches','Wireless','WirelessAccessories'</dd>
                     </dl>
-                 </div>
+                </div>
             </div>
 
             <hr/>
 
             <section id="main" class="container grid">
-                {% for value in range(17) %}
+                {% for product in products %}
                 <div class="box grid-item">
-                    <img src="#" class="img-thumbnail"/>
-                    <h3>Product name</h3>
-                    <p>description of the product</p>
+                    <img src="
+                        {% if product.Item.MediumImage is defined %}
+                            {{ product.Item.MediumImage.URL }}
+                        {% endif %}
+
+                        " />
+                    <h4><a href="#">{{ product.Item.ItemAttributes.Title }}</a></h4>
+                    <p> {{ product.Item.ItemAttributes.Author }}</p>
                     <p>category, keyword 1, keyword 2</p>
-                    <p>Price: <strong>$ {{ (12.34 * value) |round(2, 'floor') }}</strong></p>
+                    <p>Price:
+                        <strong>
+                            {% if product.Item.ItemAttributes.ListPrice is defined %}
+                            {{ product.Item.ItemAttributes.ListPrice.PriceFormatted }}
+                            {% endif %}
+                        </strong>
+                    </p>
                     <p>
                         <a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"</span></a>
                         <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"</span></a>
