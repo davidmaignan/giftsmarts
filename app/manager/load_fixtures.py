@@ -59,7 +59,7 @@ class LoadFixtures(Command):
         for category in categories:
             CategoryActions.create(category)
 
-        # id}name}description}start_time}user_id
+        # Assign randomly some category 
         print("Load Category per user")
         min = 1
         max = len(categories) + 1
@@ -71,6 +71,5 @@ class LoadFixtures(Command):
             for number in list_numbers:
                 category = CategoryActions.find_by_id(number)
                 UserActions.add_category(user, category)
-
 
         pass
