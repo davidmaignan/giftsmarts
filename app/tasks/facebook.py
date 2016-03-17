@@ -1,48 +1,40 @@
 import pprint
-from app.config.config import app, db, celery
-from app.models.user import UserActions
+from app.config.config import celery
+from app.models.user import UserActions, FriendRelationshipActions
 from app.models.event import EventActions
 from app.models.post import PostActions
 from facebook import GraphAPI
 
-@celery.task
-def add(x, y):
-    # pprint.pprint("debugging task: " + str(x + y))
-    return x + y
-
 
 @celery.task
 def get_friends(user):
-    graph = GraphAPI(user['access_token'])
+    graph = GraphAPI(user.access_token)
     args = {'fields' : 'birthday, name, email'}
-    friends = graph.get_object('me/friends', **args)
-    UserActions.add_friends(user, friends['data'])
+    facebook_friends = graph.get_object('me/friends', **args)
 
-    for friend in friends['data']:
-        get_friend_post(user, friend)
-        get_friend_event(user, friend)
-
-    return "get friends task completed"
+    for facebook_friend in facebook_friends['data']:
+        friend = UserActions.new(facebook_friend)
+        FriendRelationshipActions.create(user, friend)
+        get_friend_post(facebook_friend, user.access_token)
+        get_friend_event(facebook_friend, user.access_token)
+    pass
 
 
 @celery.task
-def get_friend_event(user, friend):
-    graph = GraphAPI(user['access_token'])
+def get_friend_event(user, access_token):
+    graph = GraphAPI(access_token)
 
-    events = graph.get_connections(friend['id'], 'events')
+    events = graph.get_connections(user['id'], 'events')
     for event in events['data']:
-        event = EventActions.create(event, friend)
-        pprint.pprint(event)
-
-    return "get friend post"
+        event = EventActions.create(event, user['id'])
+    pass
 
 
 @celery.task
-def get_friend_post(user, friend):
-    graph = GraphAPI(user['access_token'])
+def get_friend_post(user, access_token):
+    graph = GraphAPI(access_token)
 
-    posts = graph.get_connections(friend['id'], 'posts')
+    posts = graph.get_connections(user['id'], 'posts')
     for post in posts['data']:
-        post = PostActions.create(post, friend)
-
-    return "get friend post"
+        post = PostActions.create(post, user['id'])
+    pass

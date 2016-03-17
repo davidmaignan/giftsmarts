@@ -2,7 +2,9 @@ from flask import Flask
 from flask.ext.mail import Mail
 from flask.ext.script import Server
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_redis import Redis
 from app.tasks.celery import make_celery
+from amazon.api import AmazonAPI
 import os
 import yaml
 
@@ -40,8 +42,21 @@ config["FB_APP_SECRET"] = parsed_config["facebook"]["secret"]
 config["SQLALCHEMY_DATABASE_URI"] = "postgresql://" + parsed_config["database"]["user"] + ":" + \
                                     parsed_config["database"]["pass"] + "@" + parsed_config["database"]["host"] + "/" + \
                                     parsed_config["database"]["name"]
-app.config['CELERY_BROKER_URL'] = "redis://localhost:6379"
-app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6379"
+app.config['CELERY_BROKER_URL'] = "redis://" \
+                                  + parsed_config['celery']['broker_url']['host'] \
+                                  + ":" \
+                                  + str(parsed_config['celery']['broker_url']['port'])
+app.config['CELERY_RESULT_BACKEND'] = "redis://" \
+                                      + parsed_config['celery']['result_backend']['host'] \
+                                      + ":" \
+                                      + str(parsed_config['celery']['result_backend']['port'])
+app.config['AMAZON_ACCESS_KEY'] = parsed_config['amazon']['access_key']
+app.config['AMAZON_SECRET_KEY'] = parsed_config['amazon']['secret_key']
+app.config['AMAZON_ASSOC_TAG'] = parsed_config['amazon']['assoc_tag']
+
+app.config['REDIS_HOST'] = parsed_config['redis']['host']
+app.config['REDIS_PORT'] = parsed_config['redis']['port']
+app.config['REDIS_DB'] = parsed_config['redis']['db']
 
 app.config.update(config)
 
@@ -56,6 +71,14 @@ mail = Mail(app)
 
 # Celery
 celery = make_celery(app)
+
+# Redis
+redis = Redis(app)
+
+# amazon
+amazon = AmazonAPI(app.config['AMAZON_ACCESS_KEY'],
+                   app.config['AMAZON_SECRET_KEY'],
+                   app.config['AMAZON_ASSOC_TAG'])
 
 # Freeze Model modules so they can be used in the shell
 from app.routes import *
