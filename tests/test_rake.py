@@ -1,13 +1,13 @@
 from app.nlp import rake
 import unittest
 from run_tests import addTestCase
-from utils import get_file_text
+from tests.utils import get_file_text
 
 
 
 class TestRake(unittest.TestCase):
 
-    test_text = get_file_text('speech.txt')
+    test_text = get_file_text('tests/speech.txt')
 
     def test_run(self):
         keywords = rake.run(self.test_text)
