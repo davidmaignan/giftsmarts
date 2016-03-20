@@ -116,10 +116,13 @@ env/bin/python manage.py shell
 ### Creating Database
 
 ```
-# From the Flask shell
+env/bin/python manage.py createDb
+```
 
-from app.config.config import *
-db.create_all()
+### Load fixtures
+
+```
+env/bin/python manage.py loadFixtures
 ```
 
 ### Create User

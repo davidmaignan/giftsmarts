@@ -1,4 +1,6 @@
 import arrow
+import datetime
+import pprint
 from app.config.config import db
 
 
@@ -14,7 +16,7 @@ class PostActions:
     model = Post
 
     @classmethod
-    def create(cls, post, user):
+    def create(cls, post, user_id):
         try:
             created = arrow.get(post['created_time']).datetime
             story = post['story'] if ('story' in post.keys()) else post['message']
@@ -22,10 +24,28 @@ class PostActions:
             new_post = cls.model(id=post['id'],
                                  story=story,
                                  created=created,
-                                 user_id=user['id']
+                                 user_id=user_id
                                  )
             db.session.add(new_post)
             db.session.commit()
             return new_post
         except Exception:
+            return None
+
+    @classmethod
+    def create_from_csv(cls, row):
+        test = row
+        try:
+            # "id","story","created","user_id"
+            created = arrow.get(row[2], 'YYYY-MM-DD HH:mm:ss').datetime
+
+            new_post = cls.model(id=row[0],
+                                 story=row[1],
+                                 created=created,
+                                 user_id=row[3]
+                                 )
+            db.session.add(new_post)
+            db.session.commit()
+            return new_post
+        except Exception as e:
             return None

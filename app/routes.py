@@ -1,13 +1,16 @@
-import json
-import jwt
-import pprint
+import json, xmltodict, jwt, jsonpickle
 from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
 from facebook import get_user_from_cookie, GraphAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
-from app.models.user import UserActions
-from app.config.config import app, db, celery
+from app.models.user import UserActions, FriendRelationshipActions
+from app.models.amazon import ProductActions, UserProductActions
+from app.config.config import app, db, amazon
 from app.tasks import facebook as facebook_task
+from app.utils.ActionsFactory import ActionsFactory
+from app.config.config import redis
+from app.tasks import amazon as amazon_task
+
 
 def not_found():
     return "", 404
@@ -46,13 +49,29 @@ def token_required(f):
         resp = make_response(f(*args, **kwargs))
         resp.headers["token"] = "Bearer " + token
         return resp
+
     return decorated_function
 
 
-@app.route("/friends/", methods=["GET"])
-def test_task():
-    task3 = facebook_task.get_friends.delay(g.user)
-    return "friend list"
+@app.route("/facebook_friends_data/", methods=["GET"])
+def get_facebook_friends_data():
+    user = UserActions.find_by_id(g.user['id'])
+    facebook_task.get_friends.delay(user)
+    return redirect(url_for('index'))
+
+
+@app.route("/amazon/", methods=["GET"])
+def find_amazon_product():
+    products = amazon.search(Keywords='Star Wars', SearchIndex='Books')
+
+    user = UserActions.find_by_id(g.user['id'])
+
+    for product in products:
+        redis.set(product.asin, product)
+        product = ProductActions.create(product.asin)
+        UserActions.add_product(user, product)
+
+    return "Amazon sucess"
 
 
 @app.route("/", methods=["GET"], defaults={'path': ''})
@@ -64,17 +83,41 @@ def index(name="index", *args, **kawrgs):
         return "", 400
 
     if g.user:
-        try:
+        # try:
             graph = GraphAPI(g.user['access_token'])
-            args = {'fields' : 'birthday, name, email, posts, likes, books'}
-            friends = graph.get_object('me/friends', **args);
-            UserActions.add_friends(g.user, friends['data'])
+            args = {'fields': 'birthday, name, email'}
+            facebook_friends = graph.get_object('me/friends', **args);
 
-            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, friends=friends)
-        except Exception:
-            return redirect(url_for('logout'))
+            user = UserActions.find_by_id(g.user['id'])
+
+            for facebook_friend in facebook_friends['data']:
+                friend = UserActions.new(facebook_friend)
+                FriendRelationshipActions.create(user, friend)
+
+            relations = FriendRelationshipActions.find_by_user(user)
+
+            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=user, relations=relations)
+        # except Exception:
+        #     return redirect(url_for('logout'))
 
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
+
+
+@app.route("/friend/<string:friend_id>/")
+def friend_profile_page(friend_id):
+    user = UserActions.find_by_id(g.user['id'])
+    friend = UserActions.find_by_id(friend_id)
+    amazon_task.get_product.delay(friend)
+
+    products = []
+    user_products = UserProductActions.find_by_user(friend)
+
+    for user_product in user_products:
+        product = redis.get(user_product.product_id)
+        product_dict = xmltodict.parse(product)
+        products.append(product_dict)
+
+    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products)
 
 
 @app.route("/robots.txt")
@@ -89,9 +132,9 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('index'))
 
+
 @app.route("/api/auth/login", methods=["POST"])
 def login(name="login"):
-
     args = get_request_args()
 
     if not "username" in args or not "password" in args:
@@ -110,13 +153,35 @@ def login(name="login"):
 @app.route("/api/user/username", methods=["GET"])
 @token_required
 def username(name="username", token=None):
-
     user_id = jwt.get_payload(token)["sub"]
     username = UserActions.get_username(user_id)
 
     return jsonify(**{
         "username": username
     })
+
+
+@app.route('/v1/api/<string:entity>/', methods=["GET"])
+@app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
+def api_request(entity, id=None):
+    if g.user:
+        repository = ActionsFactory.get_repository(entity)
+        result = repository.filter(g.user['id'], entity_id=id)
+        return jsonpickle.encode(result.all())
+    else:
+        return "not connected"
+
+
+@app.route('/v1/api/<string:entity>/', methods=["PUT"])
+def api_request_put(entity):
+    if g.user:
+        repository = ActionsFactory.get_repository(entity)
+        data = jsonpickle.decode(request.data.decode('utf-8'))
+        result = repository.put(data['data'])
+
+        return "api_request success: " + str(result) + str(data['data'])
+    else:
+        return "not connected"
 
 
 @app.before_request
@@ -133,11 +198,9 @@ def check_user_logged_in():
 
         if not user:
             graph = GraphAPI(result['access_token'])
-            args = {'fields' : 'birthday, name, email'}
+            args = {'fields': 'birthday, name, email'}
             profile = graph.get_object('me', **args);
-
-            user = UserActions.create_user(profile, result)
-
+            UserActions.new_facebook_user(profile, result)
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
 
@@ -146,3 +209,4 @@ def check_user_logged_in():
 
     db.session.commit()
     g.user = session.get('user', None)
+
