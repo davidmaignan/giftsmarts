@@ -1,4 +1,4 @@
-import json, xmltodict, jwt, jsonpickle
+import json, xmltodict, jwt, jsonpickle, requests
 from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
 from facebook import get_user_from_cookie, GraphAPI
 from functools import wraps
@@ -10,6 +10,8 @@ from app.tasks import facebook as facebook_task
 from app.utils.ActionsFactory import ActionsFactory
 from app.config.config import redis
 from app.tasks import amazon as amazon_task
+from lxml import html
+from io import StringIO
 
 
 def not_found():
@@ -101,6 +103,30 @@ def index(name="index", *args, **kawrgs):
         #     return redirect(url_for('logout'))
 
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
+
+
+@app.template_filter('to_json')
+def to_json(value):
+    return json.dumps(value)
+
+
+@app.template_filter('curl')
+def request_reviews(value):
+    headers = {'Content-type': 'text/html', 'Accept-Encoding': 'charset=ISO-8859-1'}
+    r = requests.get(value, headers)
+
+    print(r.headers)
+
+    return r.text
+
+
+@app.route("/amazon/comments/", methods=["POST"])
+def amazon_user_comments():
+    #
+    # data = request.json
+    # print(data)
+
+    return "amazon user comments"
 
 
 @app.route("/friend/<string:friend_id>/")
