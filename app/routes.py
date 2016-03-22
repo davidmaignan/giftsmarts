@@ -211,4 +211,6 @@ def check_user_logged_in():
 
 @app.route('/user_feedback', methods=["GET"])
 def user_feedback():
-    return render_template("user_feedback.html")
+    user = UserActions.find_by_id(g.user['id'])
+    return render_template("user_feedback.html", user=user,)
+
