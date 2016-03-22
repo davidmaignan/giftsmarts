@@ -11,9 +11,9 @@ def get_product(user):
     category = CategoryActions.find_by_name("Books")
 
     for product in products:
-        product_endity = ProductActions.create(product.asin)
-        print(product_endity)
+        product_entity = ProductActions.create(product.asin)
+        print(product_entity)
         redis.set(product.asin, product.to_string())
-        UserProductActions.create(user, product_endity, category)
+        UserProductActions.create(user, product_entity, category)
     pass
 
