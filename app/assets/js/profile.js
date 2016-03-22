@@ -122,5 +122,29 @@
             var filterValue = $(this).attr('data-filter');
             mainEl.isotope({ filter: filterValue });
         });
+
+        $('.product-title-link').click(function (e){
+            e.preventDefault();
+             var data_str = $(this).closest('.grid-item').attr('data');
+             var data_json = jQuery.parseJSON(data_str);
+
+             $('#product-detail-image').attr('src', data_json.Item.LargeImage.URL);
+             $('#product-detail-title').html(data_json.Item.ItemAttributes.Title);
+             $('#product-detail-author').html(data_json.Item.ItemAttributes.Author);
+             $('#product-detail-label').html(data_json.Item.ItemAttributes.Label);
+             $('#product-detail-number-pages').html(data_json.Item.ItemAttributes.NumberOfPages);
+             $('#product-detail-release-date').html(data_json.Item.ItemAttributes.ReleaseDate);
+             $('#product-detail-price').html(data_json.Item.ItemAttributes.ListPrice.FormattedPrice);
+             $('#product-detail-description').html(data_json.Item.EditorialReviews.EditorialReview.Content);
+             $('#amazon-user-reviews').attr('src', data_json.Item.CustomerReviews.IFrameURL);
+
+             $('#main').hide();
+             $('#product-detail').removeClass('hide').show();
+         });
+
+        $('.btn-close').click(function() {
+            $('#main').show();
+            $('#product-detail').hide();
+        });
     }
 })($, Isotope);
