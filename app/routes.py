@@ -209,3 +209,6 @@ def check_user_logged_in():
     db.session.commit()
     g.user = session.get('user', None)
 
+@app.route('/user_feedback', methods=["GET"])
+def account():
+    return render_template("user_feedback.html")
