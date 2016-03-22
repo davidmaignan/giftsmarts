@@ -210,5 +210,5 @@ def check_user_logged_in():
     g.user = session.get('user', None)
 
 @app.route('/user_feedback', methods=["GET"])
-def account():
+def user_feedback():
     return render_template("user_feedback.html")
