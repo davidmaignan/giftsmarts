@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="to be defined">
     <meta name="author" content="backslash0">
-
     <meta property="fb:app_id" content="{{ app_id }}" />
-
+    <base href="/">
     <title>Gift smarts</title>
     <!-- Style -->
     <!--[if IE]>
@@ -44,7 +43,9 @@
         }(document, 'script', 'facebook-jssdk'));
     </script>
 
-    {% block content %}{% endblock %}
+    <div id="wrapper">
+        {% block content %}{% endblock %}
+    </div>
 
     <script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
 </body>

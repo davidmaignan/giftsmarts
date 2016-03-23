@@ -234,9 +234,16 @@ def username(name="username", token=None):
 @app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
 def api_request(entity, id=None):
     if g.user:
+        user = UserActions.find_by_id(g.user['id'])
+
         repository = ActionsFactory.get_repository(entity)
-        result = repository.filter(g.user['id'], entity_id=id)
-        return jsonpickle.encode(result.all())
+        result = repository.find_by_user(user)
+
+        print(result);
+
+        return jsonify(**{
+            "data": "test"
+        })
     else:
         return "not connected"
 

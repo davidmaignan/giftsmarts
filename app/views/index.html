@@ -1,104 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div id="wrapper">
-    <div id="sidebar-wrapper">
-        <h1 href="{{ url_for('index') }}">GiftSmarts</h1>
-        <img src="https://graph.facebook.com/{{user.id}}/picture?type=large" class="img-circle"/>
-        <h2>{{ user.name }}</h2>
-        <p><a href="{{ url_for('get_facebook_friends_data') }}" class="btn btn-info btn-sm" id="menu-toggle">
-            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-            Refresh my friends list</a></p>
-        <p><a class="btn btn-success" id="logout">Log out</a></p>
-    </div>
+{% include 'leftBar.html' %}
 
-    <div id="page-content-wrapper">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1>Your friends</h1>
-                    <p>This is the list of friends we have been able to retrieve from your facebook account. Use the
-                        filter to show or hide some on them.</p>
-                </div>
+<div id="page-content-wrapper" ng-app="app">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Your friends</h1>
+                <p>This is the list of friends we have been able to retrieve from your facebook account. Use the
+                    filter to show or hide some on them.</p>
             </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="btn-toolbar" role="toolbar" aria-label="...">
-                        <div class="btn-group filter-button-group" role="group">
-                            <button type="button" class="btn btn-default active"> All</button>
-                            <button type="button" class="btn btn-default" data-filter=".family"><span class="glyphicon glyphicon-user"
-                                                                                aria-hidden="true"></span> Family
-                            </button>
-                             <button type="button" class="btn btn-default" data-filter=".close_friend"><span class="glyphicon glyphicon-heart"
-                                                                                aria-hidden="true"></span> Close friends
-                            </button>
-                            <button type="button" class="btn btn-default" data-filter=".acquaintance"><span class="glyphicon glyphicon-heart"
-                                                                                aria-hidden="true"></span> Acquaintance
-                            </button>
-                            <button type="button" class="btn btn-default" data-filter=".archived"><span class="glyphicon glyphicon-ban-circle"
-                                                                                aria-hidden="true"></span> Archived
-                            </button>
-                        </div>
-                        <div class="btn-group" role="group" aria-label="...">
-                            <div class="input-group input-group-md">
-                                <span class="input-group-addon" id="sizing-addon1"><span
-                                        class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-                                <input type="text" class="form-control" placeholder="Username"
-                                       aria-describedby="sizing-addon1">
-                            </div>
+        </div>
+        <div class="row" ng-controller="IndexCtrl">
+
+            <div ng-view>
+
+            </div>
+
+            <div class="col-lg-12">
+                <div class="btn-toolbar" role="toolbar" aria-label="...">
+                    <div class="btn-group filter-button-group" role="group">
+                        <button type="button" class="btn btn-default active"> All</button>
+                        <button type="button" class="btn btn-default" data-filter=".family"><span class="glyphicon glyphicon-user"
+                                                                            aria-hidden="true"></span> Family
+                        </button>
+                         <button type="button" class="btn btn-default" data-filter=".close_friend"><span class="glyphicon glyphicon-heart"
+                                                                            aria-hidden="true"></span> Close friends
+                        </button>
+                        <button type="button" class="btn btn-default" data-filter=".acquaintance"><span class="glyphicon glyphicon-heart"
+                                                                            aria-hidden="true"></span> Acquaintance
+                        </button>
+                        <button type="button" class="btn btn-default" data-filter=".archived"><span class="glyphicon glyphicon-ban-circle"
+                                                                            aria-hidden="true"></span> Archived
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="...">
+                        <div class="input-group input-group-md">
+                            <span class="input-group-addon" id="sizing-addon1"><span
+                                    class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+                            <input type="text" class="form-control" placeholder="Username"
+                                   aria-describedby="sizing-addon1">
                         </div>
                     </div>
                 </div>
             </div>
-
-            <hr/>
-
-            <section id="main" class="container grid">
-                {% for relation in relations %}
-                <div class="box grid-item
-                    {% if relation.relation_type == 1 %}
-                        family
-                    {% elif relation.relation_type == 2 %}
-                        close_friend
-                    {% else %}
-                        acquaintance
-                    {% endif %}
-
-                    {% if relation.active == 0 %}
-                        archived
-                    {% endif %}
-                ">
-                    <img src="https://graph.facebook.com/{{relation.friend_id}}/picture?type=large" class="img-circle"/>
-                    <h4>{{ relation.to_friend.name }}</h4>
-                    <p><span class="badge primary">2</span> Presents</p>
-                    <p>
-                        <a class="label {% if relation.relation_type == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-user"
-                                                                aria-hidden="true"></span></a>
-                        <a class="label {% if relation.relation_type == 2 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-heart"
-                                                                aria-hidden="true"></span></a>
-                        <a class="label {% if relation.active == 1 %}label-default {% else %} label-success {% endif %}"><span class="glyphicon glyphicon-ban-circle"
-                                                                aria-hidden="true"></span></a>
-                    </p>
-                    <p><a href="{{ url_for('friend_profile_page', friend_id=relation.friend_id) }}" class="btn btn-info btn-block">Details</a></p>
-                </div>
-                {% endfor %}
-            </section>
-
         </div>
-        <!-- /#wrapper -->
+        <hr/>
+        <section id="main" class="container grid">
+            {% for relation in relations %}
+            <div class="box grid-item
+                {% if relation.relation_type == 1 %}
+                    family
+                {% elif relation.relation_type == 2 %}
+                    close_friend
+                {% else %}
+                    acquaintance
+                {% endif %}
+
+                {% if relation.active == 0 %}
+                    archived
+                {% endif %}
+            ">
+                <img src="https://graph.facebook.com/{{relation.friend_id}}/picture?type=large" class="img-circle"/>
+                <h4>{{ relation.to_friend.name }}</h4>
+                <p><span class="badge primary">2</span> Presents</p>
+                <p>
+                    <a class="label {% if relation.relation_type == 1 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-user"
+                                                            aria-hidden="true"></span></a>
+                    <a class="label {% if relation.relation_type == 2 %}label-success {% else %} label-default {% endif %}"><span class="glyphicon glyphicon-heart"
+                                                            aria-hidden="true"></span></a>
+                    <a class="label {% if relation.active == 1 %}label-default {% else %} label-success {% endif %}"><span class="glyphicon glyphicon-ban-circle"
+                                                            aria-hidden="true"></span></a>
+                </p>
+                <p><a href="{{ url_for('friend_profile_page', friend_id=relation.friend_id) }}" class="btn btn-info btn-block">Details</a></p>
+            </div>
+            {% endfor %}
+        </section>
     </div>
+</div>
 
+<script>
+document.getElementById('logout').onclick = function() {
+    FB.logout(function(response) {
+        console.log(response);
+        window.location.href = "/logout";
+    });
+};
 
-    <div class="center">
+</script>
 
-        <script>
-        document.getElementById('logout').onclick = function() {
-            FB.logout(function(response) {
-                console.log(response);
-                window.location.href = "/logout";
-            });
-        };
-
-        </script>
-    </div>
-    {% endblock %}
+{% endblock %}

@@ -12,6 +12,7 @@ from sqlalchemy import exists
 from sqlalchemy.orm import relationship
 from app.models.category import Category, user_categories
 from app.models.amazon import UserProduct
+from marshmallow import Schema, fields
 
 
 class FriendRelationshipType(db.Model):
@@ -38,6 +39,12 @@ class User(db.Model):
     products = relationship("UserProduct", back_populates="user")
 
 
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    birthday = fields.DateTime(dump_only=True)
+
+
 class FriendRelationship(db.Model):
     __tablename__ = 'friend_relationships'
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +54,12 @@ class FriendRelationship(db.Model):
     active = db.Column(db.Boolean, default=True)
     from_owner = db.relationship(User, primaryjoin=(owner_id == User.id), backref='to_relations')
     to_friend = db.relationship(User, primaryjoin=(friend_id == User.id), backref='from_relations')
+
+
+# class FriendRelationship(Schema):
+#     id = fields.Int(dump_only=True)
+#     owner_id = fields.Str()
+#     friend_id = fields.Str()
 
 
 class FriendRelationshipActions:
