@@ -1,6 +1,8 @@
 (function() {
     "use strict";
 
+    var $container;
+
     //substr so there isn't a '#'
     var hashFilter = location.hash.substr(1);
 
@@ -22,7 +24,6 @@
             columnWidth: columnWidth
         }
     });
-
 
     function setSizes(){
         var availableSpace = $(window).width();
@@ -49,81 +50,11 @@
         layoutTimer();
     });
 
-
-    var currentCats = hashFilter.split(".");
-    //splice because the first element will be just an empty '', so we get rid of it
-    currentCats.splice(0, 1);
-
-    for (current in currentCats){
-        currentCat = currentCats[current];
-
-        //Since it splices based on the '.', each '.' disappears, so we need to re-add it
-        currentCats[current] = '.' + currentCat;
-
-        //Find each link that has a 'href' attribute currently present in the hash
-        $('#controls a[href=#'+currentCat+']').parent().addClass('active');
-
-    }
-
-//    $('#controls a').click(function(){
-//        //Change '#cat1' into '.cat1'
-//        var catClass = '.'+$(this).attr('href').substr(1);
-//
-//        //If the current category is not in the array, add it and make the link active
-//        if($.inArray(catClass, currentCats)==-1){
-//            currentCats.push(catClass);
-//            $(this).parent().addClass('active');
-//        }
-//        //If the current category is in the array, get rid of it and remove the 'active' class
-//        else {
-//            //position of the current category in the array
-//            position = $.inArray(catClass, currentCats);
-//            currentCats.splice(position,1);
-//            $(this).parent().removeClass('active');
-//        }
-//
-//        var newFilter = "";
-//
-//        //generate a 'newFilter' string that will be saved into the hash
-//        for (current in currentCats){
-//            currentCat = currentCats[current];
-//            newFilter = newFilter + currentCat;
-//        }
-//
-//        location.hash = newFilter;
-//
-//        mainEl.isotope({
-//            filter: newFilter
-//        });
-//
-//        return false;
-//
-//    });
-
-    var $container;
-
     $(document).ready(execute);
 
-    function execute(){
-        $container = $('#container');
-        $container.packery({
-          itemSelector: '.box',
-          gutter: 10
-        });
-
-        // filter items on button click
-        $filterButton = $('.filter-button-group > button');
-
-        var $filterButton = $('.filter-button-group > button');
-
-        $('.filter-button-group > button').on( 'click', function() {
-            $filterButton.removeClass('active');
-            $(this).addClass('active');
-            var filterValue = $(this).attr('data-filter');
-            mainEl.isotope({ filter: filterValue });
-        });
-
-        $('.product-title-link').click(function (e){
+    function activateProductDetailLink() {
+         $('.product-title-link').click(function (e){
+            document.location.href="#top";
             e.preventDefault();
              var data_str = $(this).closest('.grid-item').attr('data');
              var data_json = jQuery.parseJSON(data_str);
@@ -141,10 +72,109 @@
              $('#main').hide();
              $('#product-detail').removeClass('hide').show();
          });
+    }
+
+    function execute(){
+        $container = $('#container');
+        $container.packery({
+          itemSelector: '.box',
+          gutter: 10
+        });
+
+        // filter items on button click
+        $filterButton = $('.filter-button-group > button');
+        var $filterButton = $('.filter-button-group > button');
+
+        $('.filter-button-group > button').on( 'click', function() {
+            $filterButton.removeClass('active');
+            $(this).addClass('active');
+            var filterValue = $(this).attr('data-filter');
+            mainEl.isotope({ filter: filterValue });
+        });
+
 
         $('.btn-close').click(function() {
             $('#main').show();
             $('#product-detail').hide();
         });
+
+        var task_id = $('#task-id').attr('data') || null;
+        var template = function(imageURL, title, author, price){
+            var html_tpl = '<div class="box grid-item"><img src="' + imageURL +'" /> ' +
+                            '<h4><a href="#" class="product-title-link">' + title +
+                            '</a></h4>' +
+                            '<p class="author">by:  ' + author +
+                            '</p>' +
+                            '<p>category, keyword 1, keyword 2</p>' +
+                            '<p>Price: <span class="price">' + price + '</span>' +
+                            '</p><p>' +
+                                '<a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"</span></a>' +
+                                '<a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"</span></a>' +
+                            '</p></div>'
+
+            return html_tpl;
+        };
+
+        var success = false;
+        var productTask = function() {
+            $.getJSON('/status/' + task_id, function(data) {
+                if(data.state === "SUCCESS" && success === false) {
+                        $('#progress-status').html(100 + '% completed');
+
+                        success = true;
+                        $( "#main" ).empty();
+
+                        //Stop ajax
+                        clearInterval(productTaskRefresh);
+
+                         var i = 0, total = data.products.length;
+
+                         for(i = 0; i < total; i++){
+                            var product = data.products[i];
+                            var title, imageURL, author, price;
+
+                            if(product.Item.hasOwnProperty("ItemAttributes")) {
+                                title = product.Item.ItemAttributes.Title;
+                                author = product.Item.ItemAttributes.Author;
+
+                                if(product.Item.ItemAttributes.hasOwnProperty("ListPrice")) {
+                                    price = product.Item.ItemAttributes.ListPrice.FormattedPrice;
+                                }
+                            }
+
+                            if(product.Item.hasOwnProperty("MediumImage")) {
+                                imageURL = product.Item.MediumImage.URL;
+                            }
+
+                            var tpl = template(imageURL, title, author, price);
+                            var $tpl = $(tpl).attr('data', JSON.stringify(product));
+
+                            $('#main').append($tpl);
+                         }
+
+                        var $grid = $('#main').packery({
+                            itemSelector: '.box',
+                            gutter: 30
+                        });
+
+                        activateProductDetailLink();
+
+                } else if (data.state === "FAILURE"){
+                    $("#main" ).empty();
+                    $('#main').append("<h4>An error has occured. Please try again !</h4>");
+                    clearInterval(productTaskRefresh);
+                } else if (data.state === "PROGRESS") {
+                    var percent = data.current / data.total * 100;
+
+                    $('#progress-status').html(percent + '% completed');
+
+                    console.log(data);
+                }
+            });
+        };
+
+        if(task_id !== null) {
+             var productTaskRefresh = setInterval(productTask, 1000);
+        }
     }
 })($, Isotope);

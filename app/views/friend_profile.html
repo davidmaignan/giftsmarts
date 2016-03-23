@@ -21,6 +21,7 @@
     </div>
 
     <div id="page-content-wrapper">
+        <a name="top"></a>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
@@ -30,11 +31,9 @@
             <div class="row">
                 <div class="col-lg-2">
                     <img src="https://graph.facebook.com/{{friend.id}}/picture?type=large" class="img-thumbnail block"/>
-                    <hr/>
-                    <a href="#" class="btn btn-default btn-xs btn-block">Refresh</a>
                 </div>
                 <div class="col-lg-8">
-                    <dl class="dl-horizontal">
+                    <dl class="dl-horizontal col-lg-12">
                         <dt>Birthday</dt>
                         <dd>{{ friend.birthday }}</dd>
                         <dt>Relationship</dt>
@@ -53,9 +52,20 @@
                             'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video',
                             'VideoGames','Watches','Wireless','WirelessAccessories'
                         </dd>
+                        <dt>Progress</dt>
+                        <dd id="task-id" data="{{ task }}">
+                            <table>
+                                <tr>
+                                    <td>Keyword</td>
+                                    <td>12 %</td>
+                                    <td>Progress bar</td>
+                                </tr>
+                            </table>
+                        </dd>
                     </dl>
                 </div>
             </div>
+
             <hr/>
             <div id="product-detail" class="hide">
                 <div class="row">
@@ -95,34 +105,37 @@
             </div>
 
             <section id="main" class="container grid">
-                {% for product in products %}
-                <div class="box grid-item" data='{{ product | tojson }}'>
-                    <img src="
-                        {% if product.Item.MediumImage is defined %}
-                            {{ product.Item.MediumImage.URL }}
-                        {% endif %}
-                        "/>
-                    <h4><a href="#" class="product-title-link">{{ product.Item.ItemAttributes.Title }}</a></h4>
-                    <p> {{ product.Item.ItemAttributes.Author }}</p>
-                    <p>category, keyword 1, keyword 2</p>
-                    <p>Price:
-                        <strong>
-                            {% if product.Item.ItemAttributes.ListPrice is defined %}
-                            {{ product.Item.ItemAttributes.ListPrice.PriceFormatted }}
+                {% if products | length == 0 %}
+                    <h4>We are fetching some suggestions for your friend. It's going to take a few more seconds. <span class="bold" id="progress-status"></span></h4>
+                {% else %}
+                    {% for product in products %}
+                    <div class="box grid-item" data='{{ product | tojson }}'>
+                        <img src="
+                            {% if product.Item.MediumImage is defined %}
+                                {{ product.Item.MediumImage.URL }}
                             {% endif %}
-                        </strong>
-                    </p>
-                    <p>
-                        <a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"</span></a>
-                        <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"</span></a>
-                    </p>
-                </div>
-                {% endfor %}
+                            "/>
+                        <h4><a href="#" class="product-title-link">{{ product.Item.ItemAttributes.Title }}</a></h4>
+                        <p> {{ product.Item.ItemAttributes.Author }}</p>
+                        <p>category, keyword 1, keyword 2</p>
+                        <p>Price:
+                            <strong>
+                                {% if product.Item.ItemAttributes.ListPrice is defined %}
+                                {{ product.Item.ItemAttributes.ListPrice.PriceFormatted }}
+                                {% endif %}
+                            </strong>
+                        </p>
+                        <p>
+                            <a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"</span></a>
+                            <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"</span></a>
+                        </p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
             </section>
         </div>
         <!-- /#wrapper -->
     </div>
-
 
     <div class="center">
         <script>
