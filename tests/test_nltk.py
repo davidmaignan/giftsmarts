@@ -30,6 +30,7 @@ class TestNltk(unittest.TestCase):
 
         for i in range(10):
             noun = random.choice(nouns)
+            # print('Using "%s"', (noun,))
             for k in test_keywords:
                 try:
                     products = amazon.search(Keywords=noun, SearchIndex=k)
