@@ -11,7 +11,6 @@ from sqlalchemy import exists
 from sqlalchemy.orm import relationship
 from app.models.category import Category, user_categories
 from app.models.amazon import UserProduct
-from marshmallow import Schema, fields
 
 
 class FriendRelationshipType(db.Model):
@@ -37,12 +36,6 @@ class User(db.Model):
     products = relationship("UserProduct", back_populates="user")
 
 
-class UserSchema(Schema):
-    id = fields.Int(dump_only=True)
-    name = fields.Str()
-    birthday = fields.DateTime(dump_only=True)
-
-
 class FriendRelationship(db.Model):
     __tablename__ = 'friend_relationships'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,14 +48,16 @@ class FriendRelationship(db.Model):
     to_friend = db.relationship(User, primaryjoin=(friend_id == User.id), backref='from_relations')
 
 
-# class FriendRelationship(Schema):
-#     id = fields.Int(dump_only=True)
-#     owner_id = fields.Str()
-#     friend_id = fields.Str()
-
-
 class FriendRelationshipActions:
     model = FriendRelationship
+
+    @classmethod
+    def filter(cls, user, **kwargs):
+        if kwargs['id'] is not None:
+            return cls.model.query.filter_by(owner_id=user.id, id=kwargs['id']).all()
+        else:
+            return cls.model.query.filter_by(owner_id=user.id).all()
+
 
     @classmethod
     def find_by_user(cls, user):
@@ -118,6 +113,13 @@ class FriendRelationShipTypeActions:
 
 class UserActions:
     model = User
+
+    @classmethod
+    def filter(cls, user, **kwargs):
+        if kwargs['id'] is None:
+            return cls.model.query.all()
+        else:
+            return cls.model.query.filter_by(id=kwargs['id']).all()
 
     @classmethod
     def add_product(cls, user, product):
