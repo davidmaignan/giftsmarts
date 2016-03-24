@@ -280,8 +280,6 @@ def check_user_logged_in():
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
 
-        user = UserActions.find_by_id(result['uid'])
-
         session['user'] = dict(name=user.name, profile_url=user.profile_url,
                                id=user.id, access_token=user.access_token)
 
