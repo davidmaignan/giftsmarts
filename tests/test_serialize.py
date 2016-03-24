@@ -6,6 +6,7 @@ from app.models.user import UserActions, FriendRelationshipActions
 from app.models.schema import *
 from app.models.user import FriendRelationShipTypeActions
 from app.models.category import CategoryActions
+from app.models.serializer import Serializer
 from app.models.post import PostActions
 from app.models.event import EventActions
 from app.models.amazon import ProductActions, UserProductActions
@@ -37,6 +38,13 @@ class SerializeTest(unittest.TestCase):
         user_3 = UserActions.new_facebook_user(profile_3, {'access_token': 'mock access token'})
         FriendRelationshipActions.create(self.user_1, user_2, rel_family)
         FriendRelationshipActions.create(self.user_1, user_3, rel_friend)
+
+        product_1 = ProductActions.create("1")
+        product_2 = ProductActions.create("2")
+        category = CategoryActions.create("Book")
+        UserProductActions.create(self.user_1, product_1, category)
+        UserProductActions.create(self.user_1, product_2, category)
+
 
     def tearDown(self):
         db.session.close()
@@ -78,18 +86,63 @@ class SerializeTest(unittest.TestCase):
         pass
 
     def test_user_product(self):
-        product_1 = ProductActions.create("1")
-        product_2 = ProductActions.create("2")
-        category = CategoryActions.create("Book")
-        UserProductActions.create(self.user_1, product_1, category)
-        UserProductActions.create(self.user_1, product_2, category)
-
         products = UserProductActions.find_by_user(self.user_1)
-
         user_product_schema = UserProductSchema(many=True)
         user_product_result = user_product_schema.dump(products)
         user_product_json = json.dumps(user_product_result.data)
 
+        expected = '[{"user_id": "118600698523151", "product_id": "1", "category_id": 1, "product": {"id": 1}, ' \
+                   '"user": {"id": 118600698523151, "name": "Luke Skywalker Alaaaiffajfch Occhinosky",' \
+                   ' "profile_url": "", "birthday": "1980-01-30"}}, ' \
+                   '{"user_id": "118600698523151", "product_id": "2", "category_id": 1, "product": {"id": 2}, ' \
+                   '"user": {"id": 118600698523151, "name": "Luke Skywalker Alaaaiffajfch Occhinosky", ' \
+                   '"profile_url": "", "birthday": "1980-01-30"}}]'
+
+        self.assertEqual(expected, user_product_json)
+        pass
+
+    def test_user_serializer(self):
+        users = UserActions.find_all()
+        serializer = Serializer("User", users)
+
+        # @todo assert an ordered dictionary instead
+        user_result_json = json.dumps(serializer.run())
+        user_expected_json = '[{"id": 118600698523151, "name": "Luke Skywalker Alaaaiffajfch Occhinosky",' \
+                             ' "profile_url": "", "birthday": "1980-01-30"}, {"id": 118600698523152, "name": ' \
+                             '"Han Solo Alaaaiffajfch Occhinosky", "profile_url": "", "birthday": "1979-01-30"}, ' \
+                             '{"id": 118600698523153, "name": "Padme  Alaaaiffajfch Occhinosky", ' \
+                             '"profile_url": "", "birthday": "1979-01-30"}]'
+
+        self.assertEqual(user_expected_json, user_result_json)
+
+    def test_friend_relationship_serializer(self):
+        relationships = FriendRelationshipActions.find_by_user(self.user_1)
+        serializer = Serializer("FriendRelationship", relationships)
+
+        # @todo assert an ordered dictionary instead
+        relationships_result_json = json.dumps(serializer.run())
+        relationships_expected_json = '[{"id": 1, "owner_id": "118600698523151", "friend_id": "118600698523152", ' \
+                                      '"relation_type": 1, "from_owner": {"id": 118600698523151,' \
+                                      ' "name": "Luke Skywalker Alaaaiffajfch Occhinosky", "profile_url": "", ' \
+                                      '"birthday": "1980-01-30"}, "to_friend": {"id": 118600698523152, ' \
+                                      '"name": "Han Solo Alaaaiffajfch Occhinosky", "profile_url": "", ' \
+                                      '"birthday": "1979-01-30"}, "relationship": {"id": 1, "name": "family"}}, ' \
+                                      '{"id": 2, "owner_id": "118600698523151", "friend_id": "118600698523153", ' \
+                                      '"relation_type": 2, "from_owner": {"id": 118600698523151, ' \
+                                      '"name": "Luke Skywalker Alaaaiffajfch Occhinosky", "profile_url": "", ' \
+                                      '"birthday": "1980-01-30"}, "to_friend": {"id": 118600698523153, ' \
+                                      '"name": "Padme  Alaaaiffajfch Occhinosky", "profile_url": "", ' \
+                                      '"birthday": "1979-01-30"}, "relationship": {"id": 2, "name": "friend"}}]'
+
+        self.assertEqual(relationships_expected_json, relationships_result_json)
+
+    def test_user_product_serializer(self):
+        products = UserProductActions.find_by_user(self.user_1)
+
+        serializer = Serializer("UserProduct", products)
+
+        # @todo assert an ordered dictionary instead
+        user_product_json = json.dumps(serializer.run())
         expected = '[{"user_id": "118600698523151", "product_id": "1", "category_id": 1, "product": {"id": 1}, ' \
                    '"user": {"id": 118600698523151, "name": "Luke Skywalker Alaaaiffajfch Occhinosky",' \
                    ' "profile_url": "", "birthday": "1980-01-30"}}, ' \
