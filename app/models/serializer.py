@@ -9,12 +9,14 @@ class Serializer(object):
     def __schema(self):
         if self.entity == "User":
             return UserSchema(many=True)
-        elif self.entity  == "Friend":
+        elif self.entity == "Friend":
             return UserSchema(many=True)
         elif self.entity == "FriendRelationship":
             return FriendRelationshipSchema(many=True)
         elif self.entity == "UserProduct":
             return UserProductSchema(many=True)
+        elif self.entity == "FriendRelationshipType":
+            return FriendRelationshipTypeSchema(many=True)
         else:
             assert 0, "Unknown entity for serializer: " + self.entity
 

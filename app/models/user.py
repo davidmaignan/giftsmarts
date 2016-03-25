@@ -98,6 +98,13 @@ class FriendRelationShipTypeActions:
     model = FriendRelationshipType
 
     @classmethod
+    def filter(cls, user, **kwargs):
+        if 'id' in kwargs and kwargs['id'] is not None:
+            return cls.model.query.filter_by(id=kwargs['id']).all()
+        else:
+            return cls.model.query.all()
+
+    @classmethod
     def find_by_name(cls, name):
         return cls.model.query.filter_by(name=name).one()
 

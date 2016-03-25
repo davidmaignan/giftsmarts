@@ -1,10 +1,8 @@
 import unittest
 from run_tests import addTestCase
 from app.config.config import db, app
-from app.models.user import UserActions, FriendRelationshipActions
+from app.models.user import UserActions, FriendRelationshipActions, FriendRelationShipTypeActions
 from app.models.category import CategoryActions
-from app.models.post import PostActions
-from app.models.event import EventActions
 from app.models.amazon import ProductActions, UserProductActions
 
 
@@ -14,6 +12,10 @@ class ApiTest(unittest.TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
+
+        FriendRelationShipTypeActions.create("relationship 1")
+        FriendRelationShipTypeActions.create("relationship 2")
+        FriendRelationShipTypeActions.create("relationship 3")
 
         self.profile_1 = ['118600698523151', 'Luke Skywalker Alaaaiffajfch Occhinosky', '', '', '1980-01-30']
         profile_2 = {'id': '118600698523152', 'name': 'Han Solo Alaaaiffajfch Occhinosky', 'birthday': '01/30/1979'}
@@ -34,7 +36,7 @@ class ApiTest(unittest.TestCase):
     def tearDown(self):
         db.session.close()
 
-    # User
+    # User relationship
     def test_friend_relations_filter(self):
         result = FriendRelationshipActions.filter(self.user_1, id=None)
         self.assertEqual(2, len(result))
@@ -46,5 +48,20 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(1, len(result))
 
         result = FriendRelationshipActions.filter(self.user_1, id=3)
+        self.assertEqual(0, len(result))
+        pass
+
+    # Relationship type
+    def test_relation_type_filter(self):
+        result = FriendRelationShipTypeActions.filter(self.user_1, id=None)
+        self.assertEqual(3, len(result))
+
+        result = FriendRelationShipTypeActions.filter(self.user_1)
+        self.assertEqual(3, len(result))
+
+        result = FriendRelationShipTypeActions.filter(self.user_1, id=1)
+        self.assertEqual(1, len(result))
+
+        result = FriendRelationshipActions.filter(self.user_1, id=4)
         self.assertEqual(0, len(result))
         pass
