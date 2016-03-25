@@ -1,3 +1,58 @@
-<div>
-    Index angular
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Your friends</h1>
+                <p>This is the list of friends we have been able to retrieve from your facebook account. Use the
+                    filter to show or hide some on them.</p>
+            </div>
+        </div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="btn-toolbar" role="toolbar" aria-label="...">
+            <div class="btn-group filter-button-group" role="group">
+                <button type="button" class="btn btn-default active"> All</button>
+                <button ng-repeat="relationship_type in relationship_types"
+                        type="button" class="btn btn-default"
+                        data-filter=".{{ relationship_type.name | slug}}"><span
+                        class="glyphicon glyphicon-user"
+                        aria-hidden="true"></span> {{ relationship_type.name | ucwords }}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+         <div class="input-group input-group-md col-lg-6">
+            <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+            <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+    <section id="main" class="container grid">
+            <div ng-repeat="rel in friend_relationships" class="box grid-item">
+                <img src="https://graph.facebook.com/{{rel.friend_id}}/picture?type=large" class="img-circle"/>
+                <h4>{{ rel.to_friend.name }}</h4>
+                <p><span class="badge primary">2</span> Presents</p>
+                <p>
+                    <a class="label"><span class="glyphicon glyphicon-user"
+                                                            aria-hidden="true"></span></a>
+                    <a class="label"><span class="glyphicon glyphicon-heart"
+                                                            aria-hidden="true"></span></a>
+                    <a class="label"><span class="glyphicon glyphicon-ban-circle"
+                                                            aria-hidden="true"></span></a>
+                </p>
+                <p><a href="/friend/{{ rel.friend_id }}">Details</a></p>
+            </div>
+        </section>
+
+    <ul>
+        <li ng-repeat="relationship in friend_relationships">
+            <p>{{relationship}}</p>
+        </li>
+    </ul>
+
+
 </div>

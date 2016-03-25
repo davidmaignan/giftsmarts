@@ -239,17 +239,24 @@ def username(name="username", token=None):
 @app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
 def api_request(entity, id=None):
     if g.user:
-        try:
+        # try:
             user = UserActions.find_by_id(g.user['id'])
             repository = ActionsFactory.get_repository(entity)
             result = repository.filter(user, id=id)
+
             result_to_json = Serializer(entity, result).run()
+
+            if entity == "UserProduct":
+                for elt in result_to_json:
+                    product = redis.get(elt['product_id'])
+                    product_dict = xmltodict.parse(product)
+                    elt['product_details'] = product_dict
 
             return jsonify(**{
                 "data": result_to_json
             })
-        except Exception:
-            return "Request invalid", 500
+        # except Exception:
+        #     return "Request invalid", 500
 
     else:
         return "not connected"

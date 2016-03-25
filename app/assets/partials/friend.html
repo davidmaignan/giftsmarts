@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1>{{ friend_relationship.to_friend.name }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-2">
+        <img src="https://graph.facebook.com/{{ friend_relationship.friend_id }}/picture?type=large" class="img-thumbnail block"/>
+    </div>
+    <div class="col-lg-8">
+        <dl class="dl-horizontal col-lg-12">
+            <dt>Birthday</dt>
+            <dd>{{ friend_relationship.to_friend.birthday }}</dd>
+            <dt>Relationship</dt>
+            <dd>Family</dd>
+            <dt>Category</dt>
+            <dd style="line-height: 25px;">
+                <!--{%for category in friend.categories %}-->
+                    <!--<a href="#" class="label label-default">{{ category.name }}</a>-->
+                <!--{% endfor %}-->
+            </dd>
+            <dt>Keywords:</dt>
+            <dd>'DVD','DigitalMusic','Electronics',
+                'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry',
+                'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous',
+                'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware',
+                'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video',
+                'VideoGames','Watches','Wireless','WirelessAccessories'
+            </dd>
+            <dt>Progress</dt>
+            <dd id="task-id" data="{{ task }}">
+                <table>
+                    <tr>
+                        <td>Keyword</td>
+                        <td>12 %</td>
+                        <td>Progress bar</td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+    </div>
+</div>
+<hr />
+<section id="main" class="container grid">
+    <div ng-repeat="product in user_products" class="box grid-item" data=''>
+        <img src="{{ product.product_details.Item.MediumImage.URL }} "/>
+        <h4><a href="#" class="product-title-link">{{ product.product_details.Item.ItemAttributes.Title }}</a></h4>
+        <p> {{ product.product_details.Item.ItemAttributes.Author }}</p>
+        <p>category, keyword 1, keyword 2</p>
+        <p>Price:
+            <strong>
+                {{ product.product_details.Item.ItemAttributes.ListPrice.PriceFormatted }}
+            </strong>
+        </p>
+        <p>
+            <a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span></a>
+            <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+        </p>
+    </div>
+</section>
