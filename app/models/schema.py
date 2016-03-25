@@ -58,8 +58,7 @@ class UserProductSchema(Schema):
     product_id = fields.Str()
     category_id = fields.Int()
     product = fields.Nested(ProductSchema, validate=must_not_be_blank)
-    user = fields.Nested(UserSchema, validate=must_not_be_blank)
 
     class Meta:
-        fields = ("user_id", "product_id", "category_id", "product", "user")
+        fields = ("user_id", "product_id", "category_id", "product")
         ordered = True

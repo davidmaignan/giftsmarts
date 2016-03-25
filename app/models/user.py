@@ -54,7 +54,7 @@ class FriendRelationshipActions:
     @classmethod
     def filter(cls, user, **kwargs):
         if 'id' in kwargs and kwargs['id'] is not None:
-            return cls.model.query.filter_by(owner_id=user.id, id=kwargs['id']).all()
+            return cls.model.query.filter_by(owner_id=user.id, friend_id=kwargs['id']).all()
         else:
             return cls.model.query.filter_by(owner_id=user.id).all()
 

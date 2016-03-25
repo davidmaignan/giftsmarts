@@ -37,6 +37,13 @@ class UserProductActions:
     model = UserProduct
 
     @classmethod
+    def filter(cls, user, **kwargs):
+        if 'id' in kwargs and kwargs['id'] is not None:
+            return cls.model.query.filter_by(user_id=kwargs['id']).all()
+        else:
+            return None;
+
+    @classmethod
     def create(cls, user, product, category):
         if db.session.query(exists().where(UserProduct.user_id == user.id)
                                     .where(UserProduct.product_id == product.id)).scalar() is not True:
