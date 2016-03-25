@@ -1,5 +1,6 @@
 from app.models.user import UserActions, FriendRelationshipActions
 from app.models.friend import FriendActions
+from app.models.amazon import UserProductActions
 
 
 class ActionsFactory(object):
@@ -9,9 +10,9 @@ class ActionsFactory(object):
     @staticmethod
     def get_repository(entity):
         if entity == "User": return UserActions
-        elif entity == "Friend": return FriendActions
         elif entity == "FriendRelationship" : return FriendRelationshipActions
-        assert 0, "Bad shape creation: " + type
+        elif entity == "UserProduct": return UserProductActions
+        assert 0, "Entity not supported: " + entity
         return entity
 
     def get_size(self):

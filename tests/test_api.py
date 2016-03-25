@@ -35,6 +35,16 @@ class ApiTest(unittest.TestCase):
         db.session.close()
 
     # User
-    def test_user_api_methods(self):
-            # UserActions.filter
+    def test_friend_relations_filter(self):
+        result = FriendRelationshipActions.filter(self.user_1, id=None)
+        self.assertEqual(2, len(result))
+
+        result = FriendRelationshipActions.filter(self.user_1)
+        self.assertEqual(2, len(result))
+
+        result = FriendRelationshipActions.filter(self.user_1, id=1)
+        self.assertEqual(1, len(result))
+
+        result = FriendRelationshipActions.filter(self.user_1, id=3)
+        self.assertEqual(0, len(result))
         pass

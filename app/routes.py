@@ -1,17 +1,22 @@
-import json, xmltodict, jwt, jsonpickle, requests
-from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+import json
+import jsonpickle
+import jwt
+import requests
+import xmltodict
+
 from facebook import get_user_from_cookie, GraphAPI
-from functools import wraps
-from app.controllers.userauthentication import UserAuthentication
-from app.models.user import UserActions, FriendRelationshipActions
-from app.models.amazon import ProductActions, UserProductActions
+
 from app.config.config import app, db, amazon
-from app.tasks import facebook as facebook_task
-from app.utils.ActionsFactory import ActionsFactory
 from app.config.config import redis
+from app.controllers.userauthentication import UserAuthentication
+from app.models.actionfactory import ActionsFactory
+from app.models.amazon import ProductActions, UserProductActions
+from app.models.serializer import Serializer
+from app.models.user import UserActions, FriendRelationshipActions
 from app.tasks import amazon as amazon_task
-from lxml import html
-from io import StringIO
+from app.tasks import facebook as facebook_task
+from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+from functools import wraps
 
 
 def not_found():
@@ -234,16 +239,18 @@ def username(name="username", token=None):
 @app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
 def api_request(entity, id=None):
     if g.user:
-        user = UserActions.find_by_id(g.user['id'])
+        try:
+            user = UserActions.find_by_id(g.user['id'])
+            repository = ActionsFactory.get_repository(entity)
+            result = repository.filter(user, id=id)
+            result_to_json = Serializer(entity, result).run()
 
-        repository = ActionsFactory.get_repository(entity)
-        result = repository.find_by_user(user)
+            return jsonify(**{
+                "data": result_to_json
+            })
+        except Exception:
+            return "Request invalid", 500
 
-        print(result);
-
-        return jsonify(**{
-            "data": "test"
-        })
     else:
         return "not connected"
 
