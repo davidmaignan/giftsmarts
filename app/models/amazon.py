@@ -7,9 +7,10 @@ class UserProduct(db.Model):
     __tablename__ = 'user_product'
     user_id = db.Column(db.String, db.ForeignKey('user.id'), primary_key=True)
     product_id = db.Column(db.String, db.ForeignKey('product.id'), primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     product = db.relationship("Product", back_populates="users")
     user = db.relationship("User", back_populates="products")
+    category = db.relationship("Category", back_populates="user_products")
 
 
 class Product(db.Model):
