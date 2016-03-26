@@ -11,6 +11,7 @@ class UserProduct(db.Model):
     product = db.relationship("Product", back_populates="users")
     user = db.relationship("User", back_populates="products")
     category = db.relationship("Category", back_populates="user_products")
+    active = db.Column(db.Boolean, default=True)
 
 
 class Product(db.Model):
