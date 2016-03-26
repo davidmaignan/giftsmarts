@@ -38,7 +38,6 @@ class UserDetailSchema(Schema):
     birthday = fields.Date(dump_only=True)
     categories = fields.List(fields.Nested(CategorySchema))
 
-
     class Meta:
         fields = ("id", "name", "profile_url", "birthday", "categories")
         ordered = True
