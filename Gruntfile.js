@@ -25,6 +25,7 @@ module.exports = function(grunt) {
                         'bower_components/angular-messages/angular-messages.js',
                         'bower_components/angular-ressource/angular-ressource.js',
                         'bower_components/angular-route/angular-route.js',
+                        'bower_components/angular-isotope/demo/scripts/angular-isotope.js',
                         'bower_components/ngstorage/ngStorage.js',
                         'bower_components/packery/dist/packery.pkgd.js',
                         // isotope

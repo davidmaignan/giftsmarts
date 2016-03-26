@@ -17,6 +17,7 @@ class LoadFixtures(Command):
         FriendRelationShipTypeActions.create("family")
         FriendRelationShipTypeActions.create("close friend")
         FriendRelationShipTypeActions.create("acquaintance")
+        FriendRelationShipTypeActions.create("archived")
 
         # user
         print("Load Users")
