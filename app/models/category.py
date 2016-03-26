@@ -18,6 +18,13 @@ class CategoryActions:
     model = Category
 
     @classmethod
+    def filter(cls, user, **kwargs):
+        if 'id' in kwargs and kwargs['id'] is not None:
+            return cls.model.query.filter_by(id=kwargs['id']).all()
+        else:
+            return cls.model.query.all()
+
+    @classmethod
     def find_all(cls):
         return cls.model.query.all()
 
