@@ -17,6 +17,8 @@ class Serializer(object):
             return UserProductSchema(many=True)
         elif self.entity == "FriendRelationshipType":
             return FriendRelationshipTypeSchema(many=True)
+        elif self.entity == "Category":
+            return CategorySchema(many=True)
         else:
             assert 0, "Unknown entity for serializer: " + self.entity
 
