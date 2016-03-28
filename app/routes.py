@@ -235,11 +235,11 @@ def username(name="username", token=None):
     })
 
 
-@app.route('/v1/api/<string:entity>/', methods=["GET"])
+@app.route('/v1/api/<string:entity>/', methods=["GET", "POST"])
 @app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
 def api_request(entity, id=None):
     if g.user:
-        # try:
+        try:
             user = UserActions.find_by_id(g.user['id'])
             repository = ActionsFactory.get_repository(entity)
             result = repository.filter(user, id=id)
@@ -255,23 +255,41 @@ def api_request(entity, id=None):
             return jsonify(**{
                 "data": result_to_json
             })
-        # except Exception:
-        #     return "Request invalid", 500
+        except Exception:
+            return "Request invalid", 500
 
     else:
         return "not connected"
 
 
 @app.route('/v1/api/<string:entity>/', methods=["PUT"])
+@app.route('/v1/api/<string:entity>', methods=["PUT"])
 def api_request_put(entity):
     if g.user:
         repository = ActionsFactory.get_repository(entity)
         data = jsonpickle.decode(request.data.decode('utf-8'))
         result = repository.put(data['data'])
+        result_to_json = Serializer(entity, [result]).run()
 
-        return "api_request success: " + str(result) + str(data['data'])
+        return jsonify(**{
+                "data": result_to_json
+            })
     else:
         return "not connected"
+
+
+@app.route('/v1/api', methods=["PUT"])
+def test_put():
+    data = jsonpickle.decode(request.data.decode('utf-8'))
+    values = data['data']
+    repository = ActionsFactory.get_repository(values['entity'])
+    result = repository.put(values);
+
+    result_to_json = Serializer(values['entity'], [result]).run()
+
+    return jsonify(**{
+                "data": result_to_json
+            })
 
 
 @app.before_request

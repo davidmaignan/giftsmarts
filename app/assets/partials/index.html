@@ -8,9 +8,9 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="btn-toolbar" role="toolbar" aria-label="...">
-            <div class="btn-group filter-button-group" role="group" opt-kind ok-key="filter">
-                <button type="button" class="btn btn-default active" ok-sel="*"> All</button>
-                <button ng-repeat="relationship_type in relationship_types"
+            <div id="#relastionship-filter-group" class="btn-group filter-button-group" role="group" opt-kind ok-key="filter">
+                <button id="test" type="button" class="btn btn-default active" ok-sel="*"> All</button>
+                <button id="{{ relationship_type.name | slug}}" ng-repeat="relationship_type in relationship_types"
                         type="button" class="btn btn-default"
                         ok-sel=".{{ relationship_type.name | slug}}"><span
                         class="glyphicon glyphicon-user"
@@ -33,10 +33,17 @@
             <img src="https://graph.facebook.com/{{rel.friend_id}}/picture?type=large" class="img-circle"/>
             <h4>{{ rel.to_friend.name }}</h4>
             <p><span class="badge primary">2</span> Presents</p>
-            <p>
-                <a class="label"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-                <a class="label"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></a>
-                <a class="label"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></a>
+            <p class="btn-group" role="group" aria-label="...">
+                <button ng-repeat="relationship_type in relationship_types"
+                        type="button" class="btn btn-default relationship-{{ rel.id }} relationship-type-{{relationship_type.id}}"
+                        ok-sel=".{{ relationship_type.name | slug}}"
+                        ng-model="relationship_type.id"
+                        ng-disabled="{{ isRelationshipType(relationship_type.id, rel.relationship.id) }}"
+                        ng-click="setRelationshipType(rel, relationship_type.id)"
+                ><span
+                        class="glyphicon glyphicon-user"
+                        aria-hidden="true"></span>
+                </button>
             </p>
             <p><a class="btn btn-info btn-block" href="/friend/{{ rel.friend_id }}">Details</a></p>
         </div>
