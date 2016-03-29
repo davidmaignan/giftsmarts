@@ -67,6 +67,7 @@ class FriendRelationshipSchema(Schema):
 
 
 class UserProductSchema(Schema):
+    id = fields.Int(dump_only=True)
     user_id = fields.Str()
     product_id = fields.Str()
     category_id = fields.Int()

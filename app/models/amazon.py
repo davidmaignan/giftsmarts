@@ -39,6 +39,15 @@ class UserProductActions:
     model = UserProduct
 
     @classmethod
+    def put(cls, data):
+        user_product = cls.model.query.filter_by(user_id=data['user_id'],
+                                                 product_id=data['product_id'],
+                                                 category_id=data['category_id']).one()
+        user_product.active = data['active'] == '1'
+        db.session.commit()
+        return user_product
+
+    @classmethod
     def filter(cls, user, **kwargs):
         if 'id' in kwargs and kwargs['id'] is not None:
             return cls.model.query.filter_by(user_id=kwargs['id']).all()
@@ -53,6 +62,7 @@ class UserProductActions:
             user_product.user_id = user.id
             user_product.product_id = product.id
             user_product.category_id = category.id
+            user_product.active = True
             db.session.add(user_product)
             db.session.commit()
             return user_product
