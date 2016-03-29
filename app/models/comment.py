@@ -14,20 +14,16 @@ class Comment(db.Model):
     is_contacted = db.Column(db.String, nullable=False )
 
 
-class ContactActions:
+class CommentActions:
     model =Comment
 
     @classmethod
-    def create(cls, comment, user):
+    def create(cls, comment):
         try:
-            created = arrow.get(comment['created_time']).datetime
-            story = comment['feedback'] if ('comment' in post.keys()) else post['message']
-
-            new_comment = cls.model(id=comment['id'],
-                                 user_id=user['id'],
-                                 subject=subject,
-                                 feedback=feedback,
-                                 created=created,
+            new_comment = cls.model(user_id=comment['user_id'],
+                                 subject=comment['subject'],
+                                 feedback=comment['feedback'],
+                                 created=db.func.current_timestamp(),
                                  is_contacted=0
                                  )
             db.session.add(new_comment)

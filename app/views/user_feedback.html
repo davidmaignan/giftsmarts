@@ -23,21 +23,28 @@
     </div>
 
     <div id="page-content-wrapper">
+
+
         <div class="container-fluid">
             <div class="row">
-                 <h2>Contact us</h2>
+                <h2>Contact us</h2>
+
+                {% if success %}
+                    <p>Thank you for your message. We'll get back to you shortly.</p>
+
+                {% else %}
                     <form action="{{ url_for('user_feedback') }}" method=post>
-                    {{ form.hidden_tag() }}
+                        {{ form.hidden_tag() }}
 
-                    {{ form.subject.label }}
-                    {{ form.subject }}
+                        {{ form.subject.label }}
+                        {{ form.subject }}
 
-                    {{ form.message.label }}
-                    {{ form.message }}
+                        {{ form.message.label }}
+                        {{ form.message }}
 
-                    {{ form.submit }}
-                </form>
-
+                        {{ form.submit }}
+                    </form>
+                {% endif %}
 
             </div>
 

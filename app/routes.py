@@ -9,6 +9,7 @@ from amazon.api import AmazonAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
 from app.models.user import UserActions, FriendRelationshipActions
+from app.models.comment import CommentActions
 from app.models.forms import ContactForm
 from app.config.config import app, db, celery
 from app.tasks import facebook as facebook_task
@@ -216,7 +217,12 @@ def user_feedback():
     form = ContactForm()
 
     if request.method == 'POST':
-        return 'Form posted.'
+        comment = jsonify(user_id=user,
+                          subject=form.subject.data,
+                          feedback=form.message.data),
+
+        CommentActions.create(comment)
+        return render_template('user_feedback.html', success=True, user=user)
 
     elif request.method == 'GET':
         return render_template("user_feedback.html", form=form, user=user)
