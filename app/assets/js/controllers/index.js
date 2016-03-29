@@ -32,7 +32,7 @@
                                         }
                                     }
 
-            PutService.send({}, relationshipObj, function(res){
+            FriendRelationshipService.put({}, relationshipObj, function(res){
                 relationship.relationship_type = res.data[0].relationship_type;
                 relationship.relationship = res.data[0].relationship;
                 $timeout(isotopeArrange, 500, true, relationship.id, relationshipType);

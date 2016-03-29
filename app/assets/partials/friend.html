@@ -36,19 +36,60 @@
 </div>
 <hr />
 <section id="isotopeContainer" isotope-container ng-cloak class="ng-cloak">
-    <div ng-repeat="product in user_products" isotope-item class="box grid-item {{product.category.name | slug}}">
+    <div ng-repeat="product in userProducts" isotope-item class="box grid-item {{product.category.name | slug}}">
         <img src="{{ product.product_details.Item.MediumImage.URL }} "/>
-        <h4><a href="#" class="product-title-link">{{ product.product_details.Item.ItemAttributes.Title }}</a></h4>
-        <p> {{ product.product_details.Item.ItemAttributes.Author }}</p>
-        <p>category, keyword 1, keyword 2</p>
+        <h4><a href="#" ng-click="showDetails(product)">{{ product.product_details.Item.ItemAttributes.Title }}</a></h4>
+        <p>by: {{ product.product_details.Item.ItemAttributes.Author }}</p>
+        <p><strong>{{ product.category.name }}</strong></p>
         <p>Price:
             <strong>
-                {{ product.product_details.Item.ItemAttributes.ListPrice.PriceFormatted }}
+                {{ product.product_details.Item.ItemAttributes.ListPrice.FormattedPrice }}
             </strong>
         </p>
         <p>
-            <a href="#" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span></a>
-            <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+            <button ng-click="reject(product)" href="#" class="btn btn-default">
+                <span class="glyphicon glyphicon-thumbs-down"></span>
+            </button>
+            <button ng-click="accept(product)" href="#" class="btn btn-success">
+                <span class="glyphicon glyphicon-thumbs-up"></span>
+            </button>
         </p>
+    </div>
+</section>
+<section id="product-detail" class="hide">
+      <div class="row">
+        <div class="col-lg-3 thumbnail" style="overflow: hidden;">
+            <img id="product-detail-image" src="{{ productDetail.Item.MediumImage.URL }}"/>
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 id="product-detail-title">{{ productDetail.Item.ItemAttributes.Title }}</h2>
+                    <dl class="dl-horizontal">
+                        <dt>Author:</dt>
+                        <dd id="product-detail-author">{{ productDetail.Item.ItemAttributes.Author }}</dd>
+                        <dt>ASIN:</dt>
+                        <dd id="product-detail-asin">{{ productDetail.Item.ItemAttributes.ASIN }}</dd>
+                        <dt>Label:</dt>
+                        <dd id="product-detail-label">{{ productDetail.Item.ItemAttributes.Label }}</dd>
+                        <dt>Number of pages:</dt>
+                        <dd id="product-detail-number-pages">{{ productDetail.Item.ItemAttributes.NumberOfPages }}</dd>
+                        <dt>Release date:</dt>
+                        <dd id="product-detail-release-date">{{ productDetail.Item.ItemAttributes.ReleaseDate }}</dd>
+                        <dt>Description</dt>
+                        <dd id="product-detail-description">{{ productDetail.Item.EditorialReviews.EditorialReview.Content }}</dd>
+                        <dt>Price:</dt>
+                        <dd id="product-detail-price">{{ productDetail.Item.ItemAttributes.ListPrice.PriceFormatted }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <a href="#" ng-click="hideDetails()" class="btn btn-danger btn-close">Close</a>
+        </div>
+    </div>
+    <div class="row">
+        <section id="">{{ productReview }}</section>
+        <iframe id="amazon-user-reviews" class="col-lg-12" frameBorder="0"></iframe>
     </div>
 </section>

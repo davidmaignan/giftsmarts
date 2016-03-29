@@ -150,6 +150,16 @@ def friend_profile_page(friend_id):
     return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
 
 
+@app.route('/amazon/customer-review/<string:url>')
+def request_reviews(url):
+    headers = {'Content-type': 'text/html', 'Accept-Encoding': 'charset=ISO-8859-1'}
+    r = requests.get(url, headers)
+
+    return jsonify(**{
+                "data": r.text
+    })
+
+
 @app.route('/status/<task_id>')
 def taskstatus(task_id):
     task = amazon_task.get_product.AsyncResult(task_id)
@@ -240,6 +250,7 @@ def username(name="username", token=None):
 def api_request(entity, id=None):
     if g.user:
         try:
+            # args = request.args.lists()
             user = UserActions.find_by_id(g.user['id'])
             repository = ActionsFactory.get_repository(entity)
             result = repository.filter(user, id=id)
@@ -263,7 +274,6 @@ def api_request(entity, id=None):
 
 
 @app.route('/v1/api/<string:entity>/', methods=["PUT"])
-@app.route('/v1/api/<string:entity>', methods=["PUT"])
 def api_request_put(entity):
     if g.user:
         repository = ActionsFactory.get_repository(entity)
@@ -276,20 +286,6 @@ def api_request_put(entity):
             })
     else:
         return "not connected"
-
-
-@app.route('/v1/api', methods=["PUT"])
-def test_put():
-    data = jsonpickle.decode(request.data.decode('utf-8'))
-    values = data['data']
-    repository = ActionsFactory.get_repository(values['entity'])
-    result = repository.put(values);
-
-    result_to_json = Serializer(values['entity'], [result]).run()
-
-    return jsonify(**{
-                "data": result_to_json
-            })
 
 
 @app.before_request
