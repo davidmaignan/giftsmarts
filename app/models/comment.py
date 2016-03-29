@@ -8,6 +8,7 @@ class Comment(db.Model):
     __tablename__ = 'comment'
     id = db.Column(db.String, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
+    subject = db.Column(db.String, nullable=False)
     feedback = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime, nullable=False)
     is_contacted = db.Column(db.String, nullable=False )
@@ -24,6 +25,7 @@ class ContactActions:
 
             new_comment = cls.model(id=comment['id'],
                                  user_id=user['id'],
+                                 subject=subject,
                                  feedback=feedback,
                                  created=created,
                                  is_contacted=0

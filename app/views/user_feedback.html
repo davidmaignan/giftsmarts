@@ -25,54 +25,17 @@
     <div id="page-content-wrapper">
         <div class="container-fluid">
             <div class="row">
-                <h2>Contact Us</h2>
-                <form class="form-horizontal">
-                <fieldset>
+                 <h2>Contact us</h2>
+                    <form action="{{ url_for('user_feedback') }}" method=post>
+                    {{ form.hidden_tag() }}
 
-                <!-- Text input-->
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="textinput">Subject</label>
-                        <div class="col-md-4">
-                            <input id="textinput" name="subject" class="form-control input-md" type="text">
-                        </div>
-                    </div>
+                    {{ form.subject.label }}
+                    {{ form.subject }}
 
-                <!-- Textarea -->
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="textarea">Your message</label>
-                        <div class="col-md-4">
-                            <textarea class="form-control" id="textarea" name="textarea">Type your message here</textarea>
-                        </div>
-                    </div>
+                    {{ form.message.label }}
+                    {{ form.message }}
 
-                <!-- File Button -->
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="filebutton">Add a file</label>
-                        <div class="col-md-4">
-                            <input id="filebutton" name="filebutton" class="input-file" type="file">
-                        </div>
-                    </div>
-
-                <!-- Checkbox -->
-                    <div class="form-group">
-                        <div class="col-md-4">
-                            <div class="checkbox">
-                                <label for="checkboxes-0">
-                                    <input name="checkboxes" id="checkboxes-0" value="1" type="checkbox">
-                                    I have read and agree to the Privacy Policy
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                <!-- Button (Double) -->
-                    <div class="form-group">
-                        <div class="col-md-8">
-                            <button id="submitbtn" name="submitbtn" class="btn btn-default">Submit</button>
-                            <button id="resetbtn" name="resetbtn" class="btn btn-default">Reset</button>
-                        </div>
-                    </div>
-                </fieldset>
+                    {{ form.submit }}
                 </form>
 
 

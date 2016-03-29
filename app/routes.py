@@ -3,12 +3,13 @@ import jwt
 import pprint
 import jsonpickle
 import json
-from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for, Flask, flash
 from facebook import get_user_from_cookie, GraphAPI
 from amazon.api import AmazonAPI
 from functools import wraps
 from app.controllers.userauthentication import UserAuthentication
 from app.models.user import UserActions, FriendRelationshipActions
+from app.models.forms import ContactForm
 from app.config.config import app, db, celery
 from app.tasks import facebook as facebook_task
 from app.utils.ActionsFactory import ActionsFactory
@@ -209,8 +210,13 @@ def check_user_logged_in():
     db.session.commit()
     g.user = session.get('user', None)
 
-@app.route('/user_feedback', methods=["GET"])
+@app.route('/user_feedback', methods=['GET', 'POST'])
 def user_feedback():
     user = UserActions.find_by_id(g.user['id'])
-    return render_template("user_feedback.html", user=user,)
+    form = ContactForm()
 
+    if request.method == 'POST':
+        return 'Form posted.'
+
+    elif request.method == 'GET':
+        return render_template("user_feedback.html", form=form, user=user)
