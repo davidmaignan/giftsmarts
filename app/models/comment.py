@@ -18,14 +18,14 @@ class CommentActions:
     model =Comment
 
     @classmethod
-    def create(cls, comment):
+    def create(cls, comment, user):
         try:
-            new_comment = cls.model(user_id=comment['user_id'],
-                                 subject=comment['subject'],
-                                 feedback=comment['feedback'],
-                                 created=db.func.current_timestamp(),
-                                 is_contacted=0
-                                 )
+            new_comment = cls.model(user_id= user,
+                                subject=comment['subject'],
+                                feedback=comment['feedback'],
+                                created=db.func.current_timestamp(),
+                                is_contacted=0
+                                )
             db.session.add(new_comment)
             db.session.commit()
             return new_comment
