@@ -10,6 +10,7 @@ celery==3.1.20
 cffi==1.2.1
 facebook-sdk==1.0.0a0
 Flask==0.10.1
+Flask-And-Redis==0.6
 Flask-Mail==0.9.1
 Flask-Migrate==1.6.0
 Flask-Redis==0.1.0
