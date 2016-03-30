@@ -38,7 +38,6 @@ class SerializeTest(unittest.TestCase):
         user_3 = UserActions.new_facebook_user(profile_3, {'access_token': 'mock access token'})
         FriendRelationshipActions.create(self.user_1, user_2, rel_family)
         FriendRelationshipActions.create(self.user_1, user_3, rel_friend)
-
         product_1 = ProductActions.create("1")
         product_2 = ProductActions.create("2")
         category = CategoryActions.create("Book")
@@ -60,7 +59,6 @@ class SerializeTest(unittest.TestCase):
                              '"Han Solo Alaaaiffajfch Occhinosky", "profile_url": "", "birthday": "1979-01-30"}, ' \
                              '{"id": 118600698523153, "name": "Padme  Alaaaiffajfch Occhinosky", ' \
                              '"profile_url": "", "birthday": "1979-01-30"}]'
-
         self.assertEqual(user_expected_json, user_result_json)
         pass
 
@@ -87,6 +85,14 @@ class SerializeTest(unittest.TestCase):
 
     def test_user_product(self):
         products = UserProductActions.find_by_user(self.user_1)
+        product_1 = ProductActions.create("1")
+        product_2 = ProductActions.create("2")
+        category = CategoryActions.create("Book")
+        UserProductActions.create(self.user_1, product_1, category)
+        UserProductActions.create(self.user_1, product_2, category)
+
+        products = UserProductActions.find_by_user(self.user_1)
+
         user_product_schema = UserProductSchema(many=True)
         user_product_result = user_product_schema.dump(products)
         user_product_json = json.dumps(user_product_result.data)
@@ -151,5 +157,4 @@ class SerializeTest(unittest.TestCase):
                    '"profile_url": "", "birthday": "1980-01-30"}}]'
 
         self.assertEqual(expected, user_product_json)
-
         pass

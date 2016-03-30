@@ -92,7 +92,6 @@
             mainEl.isotope({ filter: filterValue });
         });
 
-
         $('.btn-close').click(function() {
             $('#main').show();
             $('#product-detail').hide();
