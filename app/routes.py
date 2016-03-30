@@ -217,10 +217,10 @@ def user_feedback():
     form = ContactForm()
 
     if request.method == 'POST':
-        comment = jsonify(subject=form.subject.data,
-                          feedback=form.message.data),
-
-        CommentActions.create(comment, user)
+        user = UserActions.find_by_id(g.user['id'])
+        subject=form.subject.data,
+        feedback=form.message.data,
+        CommentActions.create(user, subject, feedback)
         return render_template('user_feedback.html', success=True, user=user)
 
     elif request.method == 'GET':
