@@ -211,7 +211,7 @@ def check_user_logged_in():
     db.session.commit()
     g.user = session.get('user', None)
 
-@app.route('/user_feedback', methods=['GET', 'POST'])
+@app.route('/user_feedback/', methods=['GET', 'POST'])
 def user_feedback():
     user = UserActions.find_by_id(g.user['id'])
     form = ContactForm()
