@@ -67,18 +67,63 @@ def get_facebook_friends_data():
     return redirect(url_for('index'))
 
 
-@app.route("/amazon/", methods=["GET"])
-def find_amazon_product():
-    products = amazon.search(Keywords='Star Wars', SearchIndex='Books')
-
+@app.route("/amazon/fetch-products/<string:friend_id>/", methods=["GET"])
+def amazon_fetch_product(friend_id):
     user = UserActions.find_by_id(g.user['id'])
+    friend = UserActions.find_by_id(friend_id)
 
-    for product in products:
-        redis.set(product.asin, product)
-        product = ProductActions.create(product.asin)
-        UserActions.add_product(user, product)
+    task = amazon_task.get_product.apply_async([friend])
 
-    return "Amazon sucess"
+    return jsonify(**{
+        "data": {
+            'task_id': task.id
+        }
+    })
+
+
+@app.route('/amazon/status/<task_id>/')
+def taskstatus(task_id):
+    task = amazon_task.get_product.AsyncResult(task_id)
+
+    print(task.status);
+
+    if task.status == "PROGRESS":
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': task.info.get('current', 0),
+            'total': task.info.get('total', 0),
+            'status': 'Pending...'
+        }
+    elif task.status == 'SUCCESS':
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': 3,
+            'total': 3,
+            'status': task.status,
+        }
+
+        friend = UserActions.find_by_id(task.info.get('user_id'))
+        products = []
+        user_products = UserProductActions.find_by_user(friend)
+        result_to_json = Serializer("UserProduct", user_products).run()
+
+        for user_product in result_to_json:
+            product = redis.get(user_product['product_id'])
+            product_dict = xmltodict.parse(product)
+            user_product['product_details']= product_dict
+        response['data'] = result_to_json
+    else:
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': 0,
+            'total': 0,
+            'status': 'Pending...'
+        }
+
+    return json.dumps(response)
 
 
 @app.route("/", methods=["GET"], defaults={'path': ''})
@@ -128,70 +173,26 @@ def amazon_user_comments():
 
     return "amazon user comments"
 
-
-@app.route("/friend/<string:friend_id>/")
-def friend_profile_page(friend_id):
-    user = UserActions.find_by_id(g.user['id'])
-    friend = UserActions.find_by_id(friend_id)
-    # task = amazon_task.get_product.delay(friend)
-
-    # task = amazon_task.get_product.apply_async([friend])
-
-    task = amazon_task.get_product.apply_async([friend])
-
-    products = []
-    # user_products = UserProductActions.find_by_user(friend)
-
-    # for user_product in user_products:
-    #     product = redis.get(user_product.product_id)
-    #     product_dict = xmltodict.parse(product)
-    #     products.append(product_dict)
-
-    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
-
-
-@app.route('/status/<task_id>')
-def taskstatus(task_id):
-    task = amazon_task.get_product.AsyncResult(task_id)
-
-    if task.status == "PROGRESS":
-        response = {
-            'state': task.state,
-            'task_id': task_id,
-            'current': task.info.get('current', 0),
-            'total': task.info.get('total', 0),
-            'status': 'Pending...'
-        }
-    elif task.state != 'FAILURE':
-        response = {
-            'state': task.state,
-            'task_id': task_id,
-            'current': 3,
-            'total': 3,
-            'status': task.status,
-        }
-
-        friend = UserActions.find_by_id(task.info.get('user_id'))
-        products = []
-        user_products = UserProductActions.find_by_user(friend)
-
-        for user_product in user_products:
-            product = redis.get(user_product.product_id)
-            product_dict = xmltodict.parse(product)
-            products.append(product_dict)
-
-        response['products'] = products
-
-    else:
-        response = {
-            'state': task.state,
-            'task_id': task_id,
-            'current': 0,
-            'total': 0,
-            'status': 'Pending...'
-        }
-
-    return json.dumps(response)
+#
+# @app.route("/friend/<string:friend_id>/")
+# def friend_profile_page(friend_id):
+#     user = UserActions.find_by_id(g.user['id'])
+#     friend = UserActions.find_by_id(friend_id)
+#     # task = amazon_task.get_product.delay(friend)
+#
+#     # task = amazon_task.get_product.apply_async([friend])
+#
+#     task = amazon_task.get_product.apply_async([friend])
+#
+#     products = []
+#     # user_products = UserProductActions.find_by_user(friend)
+#
+#     # for user_product in user_products:
+#     #     product = redis.get(user_product.product_id)
+#     #     product_dict = xmltodict.parse(product)
+#     #     products.append(product_dict)
+#
+#     return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
 
 
 @app.route("/robots.txt")

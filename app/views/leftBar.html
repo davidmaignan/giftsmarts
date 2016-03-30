@@ -8,7 +8,7 @@
     <p><a class="btn btn-success" id="logout">Log out</a></p>
     <div>
     {% for friend in user.to_friends %}
-    <a href="{{ url_for('friend_profile_page', friend_id=friend.id) }}">
+    <a href="">
         <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small"
              style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
     </a>

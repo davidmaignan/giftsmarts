@@ -1,6 +1,6 @@
 (function(){
     "use strict";
-    function IndexCtrl($scope, $timeout, $document, FriendRelationshipService, FriendRelationshipTypeService, PutService) {
+    function IndexCtrl($scope, $timeout, $document, FriendRelationshipService, FriendRelationshipTypeService) {
         FriendRelationshipTypeService.find_all({},
             function(res){
                 $scope.relationship_types = res.data
@@ -39,7 +39,6 @@
             }, function(err){
                 console.error(err);
             });
-
         };
     }
 
@@ -50,7 +49,7 @@
     }
 
     function isotopeArrange(relationshipId, relationshipType){
-        var s=angular.element('#isotopeContainer').scope();
+        var s = angular.element('#isotopeContainer').scope();
         s.$emit('iso-method', {name:'arrange'});
         setButtonStatus(relationshipId, relationshipType)
     }

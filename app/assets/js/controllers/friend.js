@@ -1,15 +1,57 @@
 (function(){
     "use strict";
-    function FriendCrtl($scope, $routeParams, UserProductService, FriendRelationshipService, CategoryService, AmazonReviewService, $timeout) {
+    function FriendCrtl($scope, $routeParams, UserProductService, FriendRelationshipService, CategoryService, AmazonService, $timeout) {
         $scope.productDetail = "";
+        $scope.friendId = $routeParams.id
+        $scope.taskId;
+        $scope.progressValue = 3;
 
         UserProductService.find_all({'userId': $routeParams.id, 'active': 1},
             function(res){
+            console.log(res);
                 $scope.userProducts = res.data
+
+                if($scope.userProducts.length === 0)
+                    AmazonService.fetchProducts({'userId': $scope.friendId},
+                        function(res){
+                            $scope.taskId = res.data.task_id;
+                            checkProgressUpdate();
+
+                            console.log(res)
+                        }, function(err){
+                            console.log(err);
+                        }
+                    );
             }, function(err){
                 console.log(err);
             }
         );
+
+        function checkProgressUpdate()
+        {
+            if($scope.taskId !== null) {
+                AmazonService.progressStatus({'taskId': $scope.taskId},
+                    function(res){
+                        console.log(res);
+                        $scope.progressValue = parseInt(res.current / res.total * 100);
+
+                        if(res.state === "PROGRESS" || res.state === "PENDING"){
+                            $timeout(checkProgressUpdate, 1000, true);
+                        } else if (res.state === "FAILURE"){
+                            console.log("FAILURE TO FIX")
+                        } else if (res.state === "SUCCESS") {
+                            console.log("hide progress bar");
+                            $scope.userProducts = res.data
+                        } else {
+                            console.log(res);
+                        }
+
+                    }, function(err){
+                        console.log(err);
+                    }
+                );
+            }
+        }
 
         CategoryService.find_all({},
             function(res) {
