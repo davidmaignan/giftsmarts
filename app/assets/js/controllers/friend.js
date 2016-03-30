@@ -1,15 +1,11 @@
 (function(){
     "use strict";
     function FriendCrtl($scope, $routeParams, UserProductService, FriendRelationshipService, CategoryService, AmazonReviewService, $timeout) {
-        console.log("FriendCrtl" + $routeParams.id);
-
         $scope.productDetail = "";
-        $scope.productReview = "";
 
         UserProductService.find_all({'userId': $routeParams.id, 'active': 1},
             function(res){
                 $scope.userProducts = res.data
-                console.log(res.data);
             }, function(err){
                 console.log(err);
             }
@@ -26,7 +22,6 @@
         FriendRelationshipService.find({'userId': $routeParams.id},
             function(res){
                  $scope.friend_relationship = res.data[0]
-                 console.log(res.data[0]);
             }, function(err){
                 console.log(err);
             }
@@ -36,20 +31,7 @@
             $scope.productDetail = userProduct.product_details;
             $('#isotopeContainer').hide();
             $('#product-detail').removeClass('hide').show();
-
-            var customerReviewsURL = userProduct.product_details.Item.CustomerReviews.IFrameURL;
-            var url = encodeURI(customerReviewsURL);
-
-            AmazonReviewService.get({},
-                function(res){
-                    console.log(res);
-                }, function(err){
-                    console.log(err);
-                }
-            );
-
-            console.log(url);
-
+            $('#amazon-user-reviews').attr('src', $scope.productDetail.Item.CustomerReviews.IFrameURL);
         };
 
         $scope.hideDetails = function(){

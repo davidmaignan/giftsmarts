@@ -150,16 +150,6 @@ def friend_profile_page(friend_id):
     return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
 
 
-@app.route('/amazon/customer-review/<string:url>')
-def request_reviews(url):
-    headers = {'Content-type': 'text/html', 'Accept-Encoding': 'charset=ISO-8859-1'}
-    r = requests.get(url, headers)
-
-    return jsonify(**{
-                "data": r.text
-    })
-
-
 @app.route('/status/<task_id>')
 def taskstatus(task_id):
     task = amazon_task.get_product.AsyncResult(task_id)
