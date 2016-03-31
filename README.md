@@ -53,6 +53,12 @@ GiftSmarts - Test
 ```
 ./install-dev.sh
 ```
+
+#### Install NLTK Corpus
+```
+./nltk-download.sh
+```
+
 Nginx config:
 ```
 user www-data; # Nginx will be ran by this user, should NOT be root
@@ -78,20 +84,31 @@ http {
         server_name test.flaskskeleton.com;
 
         location / {
-            proxy_pass http://127.0.0.1:8333; 
+            proxy_pass http://127.0.0.1:8333;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
 }
 
-``` 
+```
 
 Nginx is used to better simulate the production environment, completely optional of course.
 
-### Run
+### Run Server
 ```
 ./run-dev.sh
+
+```
+
+### Celery
+```
+env/bin/celery -A app.config.config.celery worker --loglevel=debug
+```
+
+### Redis
+```
+redis/src/redis-server
 ```
 
 ### Assets compilation
@@ -110,10 +127,13 @@ env/bin/python manage.py shell
 ### Creating Database
 
 ```
-# From the Flask shell
+env/bin/python manage.py createDb
+```
 
-from app.config.config import *
-db.create_all()
+### Load fixtures
+
+```
+env/bin/python manage.py loadFixtures
 ```
 
 ### Create User

@@ -1,0 +1,109 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1>{{ friend_relationship.to_friend.name }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-2">
+        <img src="https://graph.facebook.com/{{ friend_relationship.friend_id }}/picture?type=large" class="img-thumbnail block"/>
+    </div>
+    <div class="col-lg-8">
+        <dl class="dl-horizontal col-lg-12">
+            <dt>Birthday</dt>
+            <dd>{{ friend_relationship.to_friend.birthday }}</dd>
+            <dt>Relationship</dt>
+            <dd>Family</dd>
+            <dt>Category</dt>
+            <dd opt-kind ok-key="filter">
+                <a ng-repeat="category in friend_relationship.to_friend.categories" class="label label-default"
+                   ok-sel=".{{ category.name | slug}}"
+                   style="float: left;">{{ category.name }}</a>
+            </dd>
+            <dt>Keywords:</dt>
+            <dd>To be define from ntlk / rake results</dd>
+            <dt>Progress</dt>
+            <dd id="task-id" data="{{ task }}">
+                <table>
+                    <tr>
+                        <td>Keyword</td>
+                        <td>12 %</td>
+                        <td>Progress bar</td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+    </div>
+</div>
+<hr />
+<div class="row" id="progress-control">
+    <div class="col-lg-3">
+        We are searching for some gifts for your friend:
+    </div>
+    <div class="col-lg-9">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{ progressValue }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ progressValue}}%;">
+            {{ progressValue }}%
+          </div>
+        </div>
+    </div>
+</div>
+<section id="isotopeContainer" isotope-container ng-cloak class="ng-cloak">
+    <div ng-repeat="product in userProducts" isotope-item class="box grid-item {{product.category.name | slug}}">
+        <img src="{{ product.product_details.Item.MediumImage.URL }} "/>
+        <h4><a href="#" ng-click="showDetails(product)">{{ product.product_details.Item.ItemAttributes.Title }}</a></h4>
+        <p>by: {{ product.product_details.Item.ItemAttributes.Author }}</p>
+        <p><strong>{{ product.category.name }}</strong></p>
+        <p>Price:
+            <strong>
+                {{ product.product_details.Item.ItemAttributes.ListPrice.FormattedPrice }}
+            </strong>
+        </p>
+        <p>
+            <button ng-click="reject(product)" href="#" class="btn btn-default">
+                <span class="glyphicon glyphicon-thumbs-down"></span>
+            </button>
+            <button ng-click="accept(product)" href="#" class="btn btn-success">
+                <span class="glyphicon glyphicon-thumbs-up"></span>
+            </button>
+        </p>
+    </div>
+</section>
+<section id="product-detail" class="hide">
+      <div class="row">
+        <div class="col-lg-3" style="overflow: hidden;">
+            <img id="product-detail-image" class="thumbnail" src="{{ productDetail.Item.LargeImage.URL }}"/>
+            <button class="btn btn-success btn-block" ng-click="addToWishList(product)">Add to wish list</button>
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 id="product-detail-title">{{ productDetail.Item.ItemAttributes.Title }}</h2>
+                    <dl class="dl-horizontal">
+                        <dt>Author:</dt>
+                        <dd id="product-detail-author">{{ productDetail.Item.ItemAttributes.Author }}</dd>
+                        <dt>ASIN:</dt>
+                        <dd id="product-detail-asin">{{ productDetail.Item.ItemAttributes.ASIN }}</dd>
+                        <dt>Label:</dt>
+                        <dd id="product-detail-label">{{ productDetail.Item.ItemAttributes.Label }}</dd>
+                        <dt>Number of pages:</dt>
+                        <dd id="product-detail-number-pages">{{ productDetail.Item.ItemAttributes.NumberOfPages }}</dd>
+                        <dt>Release date:</dt>
+                        <dd id="product-detail-release-date">{{ productDetail.Item.ItemAttributes.ReleaseDate }}</dd>
+                        <dt>Description</dt>
+                        <dd id="product-detail-description" ng-bind-html="productDetail.Item.EditorialReviews.EditorialReview.Content | sanitize"></dd>
+                        <dt>Price:</dt>
+                        <dd id="product-detail-price">{{ productDetail.Item.ItemAttributes.ListPrice.FormattedPrice }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <a href="#" ng-click="hideDetails()" class="btn btn-danger btn-close">Close</a>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <h2>Customer reviews</h2>
+        <iframe id="amazon-user-reviews" class="col-lg-12" frameBorder="0"></iframe>
+    </div>
+</section>

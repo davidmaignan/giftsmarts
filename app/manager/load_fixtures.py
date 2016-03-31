@@ -4,6 +4,7 @@ from app.models.user import *
 from app.models.event import EventActions
 from app.models.post import PostActions
 from app.models.category import CategoryActions
+from app.constants import AMAZON_CATEGORIES
 from builtins import open
 
 
@@ -16,6 +17,7 @@ class LoadFixtures(Command):
         FriendRelationShipTypeActions.create("family")
         FriendRelationShipTypeActions.create("close friend")
         FriendRelationShipTypeActions.create("acquaintance")
+        FriendRelationShipTypeActions.create("archived")
 
         # user
         print("Load Users")
@@ -47,19 +49,12 @@ class LoadFixtures(Command):
 
         # Category
         print("Load categories")
-        categories = ['All', 'Apparel', 'Appliances', 'ArtsAndCrafts', 'Automotive', 'Baby', 'Beauty', 'Blended',
-                      'Books', 'Classical', 'Collectibles', 'DVD', 'DigitalMusic', 'Electronics', 'GiftCards',
-                      'GourmetFood', 'Grocery', 'HealthPersonalCare', 'HomeGarden', 'Industrial',
-                      'Jewelry', 'KindleStore', 'Kitchen',
-                      'LawnAndGarden', 'Marketplace', 'MP3Downloads', 'Magazines', 'Miscellaneous', 'Music',
-                      'MusicTracks', 'MusicalInstruments', 'MobileApps', 'OfficeProducts', 'OutdoorLiving',
-                      'PCHardware', 'PetSupplies', 'Photo', 'Shoes', 'Software', 'SportingGoods', 'Tools',
-                      'Toys', 'UnboxVideo', 'VHS', 'Video', 'VideoGames', 'Watches', 'Wireless', 'WirelessAccessories']
+        categories = AMAZON_CATEGORIES
 
         for category in categories:
             CategoryActions.create(category)
 
-        # id}name}description}start_time}user_id
+        # Assign randomly some category
         print("Load Category per user")
         min = 1
         max = len(categories) + 1
@@ -71,6 +66,5 @@ class LoadFixtures(Command):
             for number in list_numbers:
                 category = CategoryActions.find_by_id(number)
                 UserActions.add_category(user, category)
-
 
         pass

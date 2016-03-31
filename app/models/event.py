@@ -10,19 +10,19 @@ class Event(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
 
+
 class EventActions:
     model = Event
 
     @classmethod
-    def create(cls, event, user):
+    def create(cls, event, user_id):
         try:
             start_time = arrow.get(event['start_time']).datetime
-
             new_event = cls.model(id=event['id'],
                                   name=event['name'],
                                   description=event['description'],
                                   start_time=start_time,
-                                  user_id=user['id']
+                                  user_id=user_id
                                   )
             db.session.add(new_event)
             db.session.commit()

@@ -1,19 +1,25 @@
 import json
-import jwt
-import pprint
 import jsonpickle
 import json
 from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for, Flask, flash
+import jwt
+import requests
+import xmltodict
 from facebook import get_user_from_cookie, GraphAPI
-from amazon.api import AmazonAPI
-from functools import wraps
+from app.config.config import app, db, amazon
+from app.config.config import redis
 from app.controllers.userauthentication import UserAuthentication
+from app.models.actionfactory import ActionsFactory
+from app.models.amazon import ProductActions, UserProductActions
+from app.models.serializer import Serializer
 from app.models.user import UserActions, FriendRelationshipActions
 from app.models.comment import CommentActions
 from app.models.forms import ContactForm
 from app.config.config import app, db, celery
+from app.tasks import amazon as amazon_task
 from app.tasks import facebook as facebook_task
-from app.utils.ActionsFactory import ActionsFactory
+from flask import g, render_template, request, jsonify, make_response, session, redirect, url_for
+from functools import wraps
 
 
 def not_found():
@@ -59,23 +65,68 @@ def token_required(f):
 
 @app.route("/facebook_friends_data/", methods=["GET"])
 def get_facebook_friends_data():
-    facebook_task.get_friends.delay(g.user)
+    user = UserActions.find_by_id(g.user['id'])
+    facebook_task.get_friends.delay(user)
     return redirect(url_for('index'))
 
 
-@app.route("/amazon/", methods=["GET"])
-def find_amazon_product():
-    amazon = AmazonAPI(app.config['AMAZON_ACCESS_KEY'],
-                       app.config['AMAZON_SECRET_KEY'],
-                       app.config['AMAZON_ASSOC_TAG'])
-    #
-    products = amazon.search(Keywords='Star Wars', SearchIndex='Books')
-    #
-    # for product in products:
-    #     pprint.pprint(product.title)
-    #
-    # pprint.pprint(product.title)
-    return render_template('amazon.html', app_id=app.config["FB_APP_ID"], user=g.user, products=products)
+@app.route("/amazon/fetch-products/<string:friend_id>/", methods=["GET"])
+def amazon_fetch_product(friend_id):
+    user = UserActions.find_by_id(g.user['id'])
+    friend = UserActions.find_by_id(friend_id)
+
+    task = amazon_task.get_product.apply_async([friend])
+
+    return jsonify(**{
+        "data": {
+            'task_id': task.id
+        }
+    })
+
+
+@app.route('/amazon/status/<task_id>/')
+def taskstatus(task_id):
+    task = amazon_task.get_product.AsyncResult(task_id)
+
+    print(task.status);
+
+    if task.status == "PROGRESS":
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': task.info.get('current', 0),
+            'total': task.info.get('total', 0),
+            'status': 'Pending...'
+        }
+    elif task.status == 'SUCCESS':
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': 3,
+            'total': 3,
+            'status': task.status,
+        }
+
+        friend = UserActions.find_by_id(task.info.get('user_id'))
+        products = []
+        user_products = UserProductActions.find_by_user(friend)
+        result_to_json = Serializer("UserProduct", user_products).run()
+
+        for user_product in result_to_json:
+            product = redis.get(user_product['product_id'])
+            product_dict = xmltodict.parse(product)
+            user_product['product_details']= product_dict
+        response['data'] = result_to_json
+    else:
+        response = {
+            'state': task.state,
+            'task_id': task_id,
+            'current': 0,
+            'total': 0,
+            'status': 'Pending...'
+        }
+
+    return json.dumps(response)
 
 
 @app.route("/", methods=["GET"], defaults={'path': ''})
@@ -89,29 +140,63 @@ def index(name="index", *args, **kawrgs):
     if g.user:
         # try:
             graph = GraphAPI(g.user['access_token'])
-            args = {'fields' : 'birthday, name, email'}
-            friends = graph.get_object('me/friends', **args);
+            args = {'fields': 'birthday, name, email'}
+            facebook_friends = graph.get_object('me/friends', **args);
 
-            for friend in friends['data']:
-                UserActions.add_friend(friend)
-                FriendRelationshipActions.create(g.user, friend)
+            user = UserActions.find_by_id(g.user['id'])
 
-            relations = FriendRelationshipActions.find_all_by_user(g.user)
+            for facebook_friend in facebook_friends['data']:
+                friend = UserActions.new(facebook_friend)
+                FriendRelationshipActions.create(user, friend)
 
-            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=g.user, relations=relations)
+            relations = FriendRelationshipActions.find_by_user(user)
+
+            return render_template("index.html", app_id=app.config["FB_APP_ID"], user=user, relations=relations)
         # except Exception:
         #     return redirect(url_for('logout'))
 
     return render_template("login.html", app_id=app.config["FB_APP_ID"])
 
 
-@app.route("/friend/<string:friend_id>/")
-def friend_profile_page(friend_id):
+@app.template_filter('to_json')
+def to_json(value):
+    return json.dumps(value)
 
-    user = UserActions.find_by_id(g.user['id'])
-    friend = UserActions.find_by_id(str(friend_id))
 
-    return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend)
+@app.template_filter('curl')
+def request_reviews(value):
+    headers = {'Content-type': 'text/html', 'Accept-Encoding': 'charset=ISO-8859-1'}
+    r = requests.get(value, headers)
+
+    return r.text
+
+
+@app.route("/amazon/comments/", methods=["POST"])
+def amazon_user_comments():
+
+    return "amazon user comments"
+
+#
+# @app.route("/friend/<string:friend_id>/")
+# def friend_profile_page(friend_id):
+#     user = UserActions.find_by_id(g.user['id'])
+#     friend = UserActions.find_by_id(friend_id)
+#     # task = amazon_task.get_product.delay(friend)
+#
+#     # task = amazon_task.get_product.apply_async([friend])
+#
+#     task = amazon_task.get_product.apply_async([friend])
+#
+#     products = []
+#     # user_products = UserProductActions.find_by_user(friend)
+#
+#     # for user_product in user_products:
+#     #     product = redis.get(user_product.product_id)
+#     #     product_dict = xmltodict.parse(product)
+#     #     products.append(product_dict)
+#
+#     return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
+
 
 @app.route("/robots.txt")
 def robots():
@@ -154,13 +239,30 @@ def username(name="username", token=None):
     })
 
 
-@app.route('/v1/api/<string:entity>/', methods=["GET"])
+@app.route('/v1/api/<string:entity>/', methods=["GET", "POST"])
 @app.route('/v1/api/<entity>/<string:id>/', methods=["GET"])
 def api_request(entity, id=None):
     if g.user:
-        repository = ActionsFactory.get_repository(entity)
-        result = repository.filter(g.user['id'], entity_id=id)
-        return jsonpickle.encode(result.all())
+        try:
+            # args = request.args.lists()
+            user = UserActions.find_by_id(g.user['id'])
+            repository = ActionsFactory.get_repository(entity)
+            result = repository.filter(user, id=id)
+
+            result_to_json = Serializer(entity, result).run()
+
+            if entity == "UserProduct":
+                for elt in result_to_json:
+                    product = redis.get(elt['product_id'])
+                    product_dict = xmltodict.parse(product)
+                    elt['product_details'] = product_dict
+
+            return jsonify(**{
+                "data": result_to_json
+            })
+        except Exception:
+            return "Request invalid", 500
+
     else:
         return "not connected"
 
@@ -169,16 +271,13 @@ def api_request(entity, id=None):
 def api_request_put(entity):
     if g.user:
         repository = ActionsFactory.get_repository(entity)
-
         data = jsonpickle.decode(request.data.decode('utf-8'))
-
         result = repository.put(data['data'])
+        result_to_json = Serializer(entity, [result]).run()
 
-        # entity_dict = data['data']
-        #  user = UserActions.find_by_id(entity_dict['user_id'])
-
-        return "api_request success: " + str(result) + str(data['data'])
-
+        return jsonify(**{
+                "data": result_to_json
+            })
     else:
         return "not connected"
 
@@ -199,11 +298,9 @@ def check_user_logged_in():
             graph = GraphAPI(result['access_token'])
             args = {'fields': 'birthday, name, email'}
             profile = graph.get_object('me', **args);
-            UserActions.create_user(profile, result)
+            UserActions.new_facebook_user(profile, result)
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
-
-        user = UserActions.find_by_id(result['uid'])
 
         session['user'] = dict(name=user.name, profile_url=user.profile_url,
                                id=user.id, access_token=user.access_token)
