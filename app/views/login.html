@@ -1,9 +1,87 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="center">
-    <h3>GiftSmarts</h3>
-    <div class="fb-login-button" data-size='xlarge' data-scope="public_profile">
-        Sign in
-    </div>
+<!DOCTYPE html>
+<html xmlns:fb="http://ogp.me/ns/fb#" lang="en">
+<head>
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="to be defined">
+    <meta name="author" content="backslash0">
+    <meta property="fb:app_id" content="{{ app_id }}" />
+    <base href="/">
+    <title>Gift smarts</title>
+    <!-- Style -->
+    <!--[if IE]>
+      <script type="text/javascript">
+        var tags = ['header', 'section'];
+        while(tags.length)
+          document.createElement(tags.pop());
+      </script>
+    <![endif]-->
+     <link href="{{ url_for('static', filename='css/styles.min.css') }}" type="text/css" rel="stylesheet">
+
+    <style>
+        #login{
+            width: 100%;
+            top: -500px;
+            height: 500px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #login-container{
+            top: 460px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : {{ app_id }},
+                status     : true,
+                cookie     : true,
+                xfbml      : true
+            });
+
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location = window.location;
+            });
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+        <div id="login" class="jumbotron col-lg-12">
+            <div id="login-container">
+                <h1>GiftSmarts</h1>
+                <p>If you are running out of ideas or excuses</p>
+                <div class="fb-login-button" data-size='xlarge' data-scope="public_profile">
+                    Sign in
+                </div>
+            </div>
+        </div>
 </div>
-{% endblock %}
+<script src="{{ url_for('static', filename='js/app.min.js') }}"></script>
+<script>
+    (function(){
+        var login = function(){
+            $('#login').animate({
+                top : 0
+            },1000, "easeOutCubic" ,function(){
+                $('#login-container').animate({
+                    top: 200
+                }, 700, "easeOutCubic");
+            });
+        };
+
+        $(document).ready(login);
+    }());
+</script>
+</body>
+</html>
