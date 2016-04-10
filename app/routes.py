@@ -324,7 +324,7 @@ def user_feedback():
         return render_template("user_feedback.html", form=form, user=user)
 
 @app.route('/contact_us/', methods=['GET', 'POST'])
-def user_feedback():
+def contact_us():
     user = UserActions.find_by_id(g.user['id'])
 
     if request.method == 'POST':
@@ -332,7 +332,7 @@ def user_feedback():
         subject=comment.subject.data,
         feedback=comment.message.data,
         CommentActions.create(user, subject, feedback)
-        return render_template('user_feedback.html', success=True, user=user)
+        return render_template('contactUs.html', success=True, user=user)
 
     elif request.method == 'GET':
-        return render_template("user_feedback.html", user=user)
+        return render_template("contactUs.html", user=user)
