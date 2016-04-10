@@ -7,7 +7,7 @@ from flask import g
 
 class Comment(db.Model):
     __tablename__ = 'comment'
-    id = db.Column(db.Integer, primary_key=True, default=mydefault)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('user.id'))
     subject = db.Column(db.String, nullable=False)
     feedback = db.Column(db.String, nullable=False)
