@@ -7,6 +7,10 @@
                 templateUrl: '/static/partials/index.html',
                 controller: 'IndexCtrl'
             })
+            .when('/friend/:id', {
+                templateUrl: '/static/partials/friend.html',
+                controller: 'FriendCrtl'
+            })
             .when('/login/', {
                 templateUrl: '/static/partials/login.html'
             })

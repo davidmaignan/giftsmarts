@@ -52,6 +52,14 @@ class FriendRelationshipActions:
     model = FriendRelationship
 
     @classmethod
+    def filter(cls, user, **kwargs):
+        if 'id' in kwargs and kwargs['id'] is not None:
+            return cls.model.query.filter_by(owner_id=user.id, friend_id=kwargs['id']).all()
+        else:
+            return cls.model.query.filter_by(owner_id=user.id).all()
+
+
+    @classmethod
     def find_by_user(cls, user):
         return cls.model.query.filter_by(owner_id=user.id).all()
 
@@ -90,6 +98,13 @@ class FriendRelationShipTypeActions:
     model = FriendRelationshipType
 
     @classmethod
+    def filter(cls, user, **kwargs):
+        if 'id' in kwargs and kwargs['id'] is not None:
+            return cls.model.query.filter_by(id=kwargs['id']).all()
+        else:
+            return cls.model.query.all()
+
+    @classmethod
     def find_by_name(cls, name):
         return cls.model.query.filter_by(name=name).one()
 
@@ -105,6 +120,13 @@ class FriendRelationShipTypeActions:
 
 class UserActions:
     model = User
+
+    @classmethod
+    def filter(cls, user, **kwargs):
+        if kwargs['id'] is None:
+            return cls.model.query.all()
+        else:
+            return cls.model.query.filter_by(id=kwargs['id']).all()
 
     @classmethod
     def add_product(cls, user, product):

@@ -6,6 +6,7 @@ node_modules/
 static/css/*.css
 static/css/*.map
 static/js/*.js
+static/partials/
 .sass-cache/
 
 # IDEA
@@ -76,6 +77,7 @@ target/
 
 # redis
 redis/
+*.rdb
 
 # logs
 logs/*\.log

@@ -1,30 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
+{% include 'leftBar.html' %}
 
-<div id="wrapper">
-    <div id="sidebar-wrapper" style="overflow: scroll;">
-        <h1 href="{{ url_for('index') }}">GiftSmarts</h1>
-        <img src="https://graph.facebook.com/{{user.id}}/picture?type=large" class="img-circle"/>
-        <h2>{{ user['name'] }}</h2>
-        <p><a href="{{ url_for('get_facebook_friends_data') }}" class="btn btn-info btn-sm" id="menu-toggle">
-            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-            Refresh my friends list</a></p>
-        <p><a class="btn btn-success" id="logout">Log out</a></p>
-        <div>
-            {% for friend in user.to_friends %}
-            <a href="{{ url_for('friend_profile_page', friend_id=friend.id) }}">
-                <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small"
-                     style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
-            </a>
-            {% endfor %}
+<div id="page-content-wrapper">
+    <a name="top"></a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>{{ friend.name }}</h1>
+            </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <img src="https://graph.facebook.com/{{friend.id}}/picture?type=large" class="img-thumbnail block"/>
+            </div>
+            <div class="col-lg-8">
+                <dl class="dl-horizontal col-lg-12">
+                    <dt>Birthday</dt>
+                    <dd>{{ friend.birthday }}</dd>
+                    <dt>Relationship</dt>
+                    <dd>Family</dd>
+                    <dt>Category</dt>
+                    <dd style="line-height: 25px;">
+                        {%for category in friend.categories %}
+                            <a href="#" class="label label-default">{{ category.name }}</a>
+                        {% endfor %}
+                    </dd>
+                    <dt>Keywords:</dt>
+                    <dd>'DVD','DigitalMusic','Electronics',
+                        'GiftCards','GourmetFood','Grocery','HealthPersonalCare','HomeGarden','Industrial','Jewelry',
+                        'KindleStore','Kitchen','LawnAndGarden','Marketplace','MP3Downloads','Magazines','Miscellaneous',
+                        'Music','MusicTracks','MusicalInstruments','MobileApps','OfficeProducts','OutdoorLiving','PCHardware',
+                        'PetSupplies','Photo','Shoes','Software','SportingGoods','Tools','Toys','UnboxVideo','VHS','Video',
+                        'VideoGames','Watches','Wireless','WirelessAccessories'
+                    </dd>
+                    <dt>Progress</dt>
+                    <dd id="task-id" data="{{ task }}">
+                        <table>
+                            <tr>
+                                <td>Keyword</td>
+                                <td>12 %</td>
+                                <td>Progress bar</td>
+                            </tr>
+                        </table>
+                    </dd>
+                </dl>
+            </div>
+        </div>
 
-    <div id="page-content-wrapper">
-        <div class="container-fluid">
+        <hr/>
+        <div id="product-detail" class="hide">
             <div class="row">
-                <div class="col-lg-12">
-                    <h1>{{ friend.name }}</h1>
+                <div class="col-lg-3 thumbnail" style="overflow: hidden;">
+                    <img id="product-detail-image"/>
                 </div>
             </div>
             <div class="row">
@@ -95,6 +123,7 @@
             </div>
 
             <section id="main" class="container grid">
+
                 {% for product in products %}
                 <div class="box grid-item" data='{{ product | tojson }}'>
                     <img src="
@@ -122,18 +151,14 @@
         </div>
         <!-- /#wrapper -->
     </div>
-
-
-    <div class="center">
-        <script>
-        document.getElementById('logout').onclick = function() {
-            FB.logout(function(response) {
-                console.log(response);
-                window.location.href = "/logout";
-            });
-        };
-        </script>
-    </div>
 </div>
 
+<script>
+document.getElementById('logout').onclick = function() {
+    FB.logout(function(response) {
+        console.log(response);
+        window.location.href = "/logout";
+    });
+};
+</script>
 {% endblock %}

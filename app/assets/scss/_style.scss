@@ -7,6 +7,7 @@
     border: 1px solid #cdcdcd;
     padding: 15px;
     margin-bottom: 25px;
+    margin-right: 25px;
     float: left;
     text-align: center;
     min-height: 400px;
@@ -24,4 +25,9 @@
 
 .box > img {
     border: 1px solid #ddd;
+}
+
+
+a.relationship-link {
+    margin: 0 3px;
 }

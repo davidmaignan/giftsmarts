@@ -95,9 +95,20 @@ http {
 
 Nginx is used to better simulate the production environment, completely optional of course.
 
-### Run
+### Run Server
 ```
 ./run-dev.sh
+
+```
+
+### Celery
+```
+env/bin/celery -A app.config.config.celery worker --loglevel=debug
+```
+
+### Redis
+```
+redis/src/redis-server
 ```
 
 ### Assets compilation
