@@ -9,7 +9,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import exists
 from sqlalchemy.orm import relationship
-from app.models.category import Category, user_categories
+from app.models.category import Category, CategoryActions, user_categories
 from app.models.amazon import UserProduct
 
 
@@ -159,6 +159,13 @@ class UserActions:
                              profile_url=row[2],
                              access_token=row[3],
                              birthday=birthday)
+
+        # Add all category by default
+        categories = CategoryActions.find_all();
+        for category in categories:
+            new_user.categories.append(category)
+
+        db.session.add(new_user)
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -171,6 +178,12 @@ class UserActions:
                              profile_url="",
                              birthday=birthday,
                              access_token=result['access_token'])
+
+        # Add all category by default
+        categories = CategoryActions.find_all();
+        for category in categories:
+            new_user.categories.append(category)
+
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -184,8 +197,15 @@ class UserActions:
                                  profile_url="",
                                  birthday=birthday,
                                  access_token="")
+
+            # Add all category by default
+            categories = CategoryActions.find_all();
+            for category in categories:
+                new_user.categories.append(category)
+
             db.session.add(new_user)
             db.session.commit()
+
             return new_user
         else:
             return UserActions.find_by_id(user['id'])
