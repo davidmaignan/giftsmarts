@@ -37,11 +37,18 @@
 
                         if(res.state === "PROGRESS" || res.state === "PENDING"){
                             $timeout(checkProgressUpdate, 1000, true);
+
+                            if(res.hasOwnProperty('data') === true){
+                                $scope.userProducts = res.data
+                            }
                         } else if (res.state === "FAILURE"){
                             console.log("FAILURE TO FIX")
                         } else if (res.state === "SUCCESS") {
                             console.log("hide progress bar");
-                            $scope.userProducts = res.data
+                            $scope.userProducts = res.data;
+
+                            $('#progress-control').hide();
+
                         } else {
                             console.log(res);
                         }
