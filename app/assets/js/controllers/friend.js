@@ -5,13 +5,15 @@
         $scope.friendId = $routeParams.id
         $scope.taskId;
         $scope.progressValue = 3;
+        $scope.userProducts = [];
+        $scope.maxRequests = 11;
+        $scope.totalRequests = 0;
 
         UserProductService.find_all({'userId': $routeParams.id, 'active': 1},
             function(res){
-            console.log(res);
-                $scope.userProducts = res.data
+                $scope.userProducts = res.data;
 
-                if($scope.userProducts.length === 0)
+                if($scope.userProducts.length === 0) {
                     AmazonService.fetchProducts({'userId': $scope.friendId},
                         function(res){
                             $scope.taskId = res.data.task_id;
@@ -22,6 +24,9 @@
                             console.log(err);
                         }
                     );
+                } else{
+                    $('#progress-control').slideUp('slow');
+                }
             }, function(err){
                 console.log(err);
             }
@@ -34,21 +39,32 @@
                     function(res){
                         console.log(res);
                         $scope.progressValue = parseInt(res.current / res.total * 100);
+                        $scope.totalRequests++;
 
                         if(res.state === "PROGRESS" || res.state === "PENDING"){
-                            $timeout(checkProgressUpdate, 1000, true);
+
+                            if ($scope.maxRequests > $scope.totalRequests){
+                                $timeout(checkProgressUpdate, 1000, true);
+                            }
 
                             if(res.hasOwnProperty('data') === true){
-                                $scope.userProducts = res.data
+                                for(var elt in res.data){
+                                    if ($scope.userProducts.indexOf(res.data[elt]) == -1) {
+                                         $scope.userProducts.push(res.data[elt]);
+                                     }
+                                }
                             }
                         } else if (res.state === "FAILURE"){
                             console.log("FAILURE TO FIX")
                         } else if (res.state === "SUCCESS") {
-                            console.log("hide progress bar");
-                            $scope.userProducts = res.data;
-
-                            $('#progress-control').hide();
-
+                            if(res.hasOwnProperty('data') === true){
+                                for(var elt in res.data){
+                                    if ($scope.userProducts.indexOf(res.data[elt]) == -1) {
+                                         $scope.userProducts.push(res.data[elt]);
+                                     }
+                                }
+                            }
+                            $('#progress-control').hide('slow');
                         } else {
                             console.log(res);
                         }

@@ -56,6 +56,18 @@
             });
             $timeout(isotopeReArrange, 500, true);
         }
+
+        $scope.setRelationshipIcon = function (value) {
+            if(value == 1) {
+                return "glyphicon-heart";
+            } else if (value == 2){
+                return "glyphicon-heart-empty";
+            } else if (value == 3) {
+                return "glyphicon-user";
+            }else {
+                return "glyphicon-compressed";
+            }
+        }
     }
 
     function setButtonStatus(id, type) {

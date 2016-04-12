@@ -13,7 +13,7 @@
                 <button id="{{ relationship_type.name | slug}}" ng-repeat="relationship_type in relationship_types"
                         type="button" class="btn btn-default"
                         ok-sel=".{{ relationship_type.name | slug}}"><span
-                        class="glyphicon glyphicon-user"
+                        class="glyphicon {{ setRelationshipIcon(relationship_type.id) }}"
                         aria-hidden="true"></span> {{ relationship_type.name | ucwords }}
                 </button>
             </div>
@@ -43,9 +43,9 @@
                         ng-model="relationship_type.id"
                         ng-disabled="{{ isRelationshipType(relationship_type.id, rel.relationship.id) }}"
                         ng-click="setRelationshipType(rel, relationship_type.id)"
-                ><span
-                        class="glyphicon glyphicon-user"
-                        aria-hidden="true"></span>
+                >
+                    <friend-relationship type="{{ relationship_type.name | slug}}" relationship="{{ rel.relationship.name | slug}}"/>
+
                 </button>
             </p>
             <p><a class="btn btn-info btn-block" href="/friend/{{ rel.friend_id }}">Details</a></p>
