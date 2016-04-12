@@ -85,8 +85,6 @@ def amazon_fetch_product(friend_id):
 def taskstatus(task_id):
     task = amazon_task.get_product.AsyncResult(task_id)
 
-    print(task.status);
-
     if task.status == "PROGRESS":
         response = {
             'state': task.state,
@@ -95,6 +93,18 @@ def taskstatus(task_id):
             'total': task.info.get('total', 0),
             'status': 'Pending...'
         }
+
+        friend = UserActions.find_by_id(task.info.get('user_id'))
+        products = []
+        user_products = UserProductActions.find_by_user(friend)
+        result_to_json = Serializer("UserProduct", user_products).run()
+
+        for user_product in result_to_json:
+            product = redis.get(user_product['product_id'])
+            product_dict = xmltodict.parse(product)
+            user_product['product_details']= product_dict
+        response['data'] = result_to_json
+
     elif task.status == 'SUCCESS':
         response = {
             'state': task.state,
@@ -166,33 +176,6 @@ def request_reviews(value):
     r = requests.get(value, headers)
 
     return r.text
-
-
-@app.route("/amazon/comments/", methods=["POST"])
-def amazon_user_comments():
-
-    return "amazon user comments"
-
-#
-# @app.route("/friend/<string:friend_id>/")
-# def friend_profile_page(friend_id):
-#     user = UserActions.find_by_id(g.user['id'])
-#     friend = UserActions.find_by_id(friend_id)
-#     # task = amazon_task.get_product.delay(friend)
-#
-#     # task = amazon_task.get_product.apply_async([friend])
-#
-#     task = amazon_task.get_product.apply_async([friend])
-#
-#     products = []
-#     # user_products = UserProductActions.find_by_user(friend)
-#
-#     # for user_product in user_products:
-#     #     product = redis.get(user_product.product_id)
-#     #     product_dict = xmltodict.parse(product)
-#     #     products.append(product_dict)
-#
-#     return render_template("friend_profile.html", app_id=app.config["FB_APP_ID"], user=user, friend=friend, products=products, task=task)
 
 
 @app.route("/robots.txt")
@@ -298,6 +281,8 @@ def check_user_logged_in():
             UserActions.new_facebook_user(profile, result)
         elif user.access_token != result['access_token']:
             user.access_token = result['access_token']
+
+        user = UserActions.find_by_id(result['uid'])
 
         session['user'] = dict(name=user.name, profile_url=user.profile_url,
                                id=user.id, access_token=user.access_token)

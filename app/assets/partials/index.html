@@ -13,7 +13,7 @@
                 <button id="{{ relationship_type.name | slug}}" ng-repeat="relationship_type in relationship_types"
                         type="button" class="btn btn-default"
                         ok-sel=".{{ relationship_type.name | slug}}"><span
-                        class="glyphicon glyphicon-user"
+                        class="glyphicon {{ setRelationshipIcon(relationship_type.id) }}"
                         aria-hidden="true"></span> {{ relationship_type.name | ucwords }}
                 </button>
             </div>
@@ -22,14 +22,17 @@
     <div class="col-lg-6">
          <div class="input-group input-group-md col-lg-6">
             <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-            <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+            <input ng-model="query" ng-change="searchFriend(query)" type="text" class="form-control"
+                   placeholder="Username" aria-describedby="sizing-addon1">
         </div>
     </div>
 </div>
 
+<hr />
+
 <div class="row">
     <section id="isotopeContainer" isotope-container ng-cloak class="ng-cloak">
-        <div ng-repeat="rel in friend_relationships" isotope-item class="box grid-item {{rel.relationship.name | slug}}">
+        <div ng-repeat="rel in filter_friend_relationships" isotope-item class="box grid-item {{rel.relationship.name | slug}}">
             <img src="https://graph.facebook.com/{{rel.friend_id}}/picture?type=large" class="img-circle"/>
             <h4>{{ rel.to_friend.name }}</h4>
             <p><span class="badge primary">2</span> Presents</p>
@@ -40,9 +43,9 @@
                         ng-model="relationship_type.id"
                         ng-disabled="{{ isRelationshipType(relationship_type.id, rel.relationship.id) }}"
                         ng-click="setRelationshipType(rel, relationship_type.id)"
-                ><span
-                        class="glyphicon glyphicon-user"
-                        aria-hidden="true"></span>
+                >
+                    <friend-relationship type="{{ relationship_type.name | slug}}" relationship="{{ rel.relationship.name | slug}}"/>
+
                 </button>
             </p>
             <p><a class="btn btn-info btn-block" href="/friend/{{ rel.friend_id }}">Details</a></p>
