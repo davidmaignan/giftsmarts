@@ -7,7 +7,22 @@ database:
     pass: Devpass123
     host: localhost
     name: giftsmarts
+redis:
+    host: localhost
+    port: 6379
+    db: 0
+celery:
+    broker_url:
+        host: localhost
+        port: 6379
+    result_backend:
+        host: localhost
+        port: 6379
 facebook:
     id: '1670209469887605'
     name: GiftSmarts
     secret: 65c27afa66f17051324f3a64243c7133
+amazon:
+    access_key: AKIAJ5S4XOKAQAWGW67Q
+    secret_key: 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
+    assoc_tag: giftsmarts-20

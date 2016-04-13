@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 if ! hash grunt 2>/dev/null; then
     npm install -g grunt@0.1.13
@@ -22,3 +22,15 @@ cd facebook-sdk
 ../env/bin/python3.4 setup.py install
 cd ..
 rm -rf facebook-sdk
+
+# Redis installation
+if [ ! -d redis/src ]; then
+    curl -O http://download.redis.io/redis-stable.tar.gz
+    tar xvzf redis-stable.tar.gz
+    rm redis-stable.tar.gz
+    cd redis-stable
+    make
+    cd ..
+    mv redis-stable redis
+fi
+

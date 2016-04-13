@@ -1,30 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="center">
-    <p class='circle-image'
-       style="background-image: url(https://graph.facebook.com/{{ user['id'] }}/picture?type=large);
-              margin-left: auto; margin-right: auto;">
-    </p>
-    <h3>Hello, {{ user['name'] }}.</h3>
-     <img src="https://graph.facebook.com/{{user['id']}}/picture?type=large" />
-     <a href="#" id="logout">Log out</a>
-     <hr />
-
-    <div id="container">
-        {% for friend in friends['data'] %}
-            <div class="item">
-              <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=large" />
-              <p>{{ friend['name']}}</p>
-            </div>
-        {% endfor %}
+{% include 'leftBar.html' %}
+<div id="page-content-wrapper">
+    <div class="container-fluid" ng-app="app">
+            <div ng-view />
     </div>
-    <script>
-        document.getElementById('logout').onclick = function() {
-            FB.logout(function(response) { 
-                console.log(response);
-                window.location.href = "/logout";
-            });
-        };
-    </script>
 </div>
+
+<script>
+document.getElementById('logout').onclick = function() {
+    FB.logout(function(response) {
+        console.log(response);
+        window.location.href = "/logout";
+    });
+};
+</script>
 {% endblock %}

@@ -5,6 +5,7 @@
         'ngResource',
         'ngSanitize',
         'ngMessages',
-        'ngStorage'
+        'ngStorage',
+        'iso.directives'
     ]);
 })();

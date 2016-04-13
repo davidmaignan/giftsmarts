@@ -1,3 +1,54 @@
-<div>
-    index
+<div class="row">
+    <div class="col-lg-12">
+        <h1>Your friends</h1>
+        <p>This is the list of friends we have been able to retrieve from your facebook account. Use the
+            filter to show or hide some on them.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="btn-toolbar" role="toolbar" aria-label="...">
+            <div id="#relastionship-filter-group" class="btn-group filter-button-group" role="group" opt-kind ok-key="filter">
+                <button id="test" type="button" class="btn btn-default active" ok-sel="*"> All</button>
+                <button id="{{ relationship_type.name | slug}}" ng-repeat="relationship_type in relationship_types"
+                        type="button" class="btn btn-default"
+                        ok-sel=".{{ relationship_type.name | slug}}"><span
+                        class="glyphicon {{ setRelationshipIcon(relationship_type.id) }}"
+                        aria-hidden="true"></span> {{ relationship_type.name | ucwords }}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+         <div class="input-group input-group-md col-lg-6">
+            <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
+            <input ng-model="query" ng-change="searchFriend(query)" type="text" class="form-control"
+                   placeholder="Username" aria-describedby="sizing-addon1">
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <section id="isotopeContainer" isotope-container ng-cloak class="ng-cloak">
+        <div ng-repeat="rel in filter_friend_relationships" isotope-item class="box grid-item {{rel.relationship.name | slug}}">
+            <img src="https://graph.facebook.com/{{rel.friend_id}}/picture?type=large" class="img-circle"/>
+            <h4>{{ rel.to_friend.name }}</h4>
+            <p><span class="badge primary">2</span> Presents</p>
+            <p class="btn-group" role="group" aria-label="...">
+                <button ng-repeat="relationship_type in relationship_types"
+                        type="button" class="btn btn-default relationship-{{ rel.id }} relationship-type-{{relationship_type.id}}"
+                        ok-sel=".{{ relationship_type.name | slug}}"
+                        ng-model="relationship_type.id"
+                        ng-disabled="{{ isRelationshipType(relationship_type.id, rel.relationship.id) }}"
+                        ng-click="setRelationshipType(rel, relationship_type.id)"
+                >
+                    <friend-relationship type="{{ relationship_type.name | slug}}" relationship="{{ rel.relationship.name | slug}}"/>
+
+                </button>
+            </p>
+            <p><a class="btn btn-info btn-block" href="/friend/{{ rel.friend_id }}">Details</a></p>
+        </div>
+    </section>
 </div>

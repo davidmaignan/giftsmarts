@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 
 export FLASK_ENV="dev"
 

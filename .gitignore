@@ -2,6 +2,16 @@
 bower_components/
 node_modules/
 
+# CSS / JS
+static/css/*.css
+static/css/*.map
+static/js/*.js
+static/partials/
+.sass-cache/
+
+# IDEA
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -64,3 +74,10 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# redis
+redis/
+*.rdb
+
+# logs
+logs/*\.log
