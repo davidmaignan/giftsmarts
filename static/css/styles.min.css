@@ -4,4 +4,12 @@ footer {
   text-align: center;
 }
 
+.item {
+  width: 22%;
+}
+
+.item.w2 {
+  width: 50%;
+}
+
 /*# sourceMappingURL=styles.min.css.map */

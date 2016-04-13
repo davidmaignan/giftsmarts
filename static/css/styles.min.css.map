@@ -1,7 +1,7 @@
 {
 "version": 3,
-"mappings": "AAAA,MAAO;EACH,OAAO,EAAE,KAAK;EACd,MAAM,EAAE,MAAM;EACd,UAAU,EAAE,MAAM",
-"sources": ["../../app/assets/scss/_footer.scss"],
+"mappings": "AAAA,MAAO;EACH,OAAO,EAAE,KAAK;EACd,MAAM,EAAE,MAAM;EACd,UAAU,EAAE,MAAM;;;ACHtB,KAAM;EAAE,KAAK,EAAE,GAAG;;;AAClB,QAAS;EAAE,KAAK,EAAE,GAAG",
+"sources": ["../../app/assets/scss/_footer.scss","../../app/assets/scss/_style.scss"],
 "names": [],
 "file": "styles.min.css"
 }
