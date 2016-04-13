@@ -50,7 +50,7 @@ class UserProductActions:
     @classmethod
     def filter(cls, user, **kwargs):
         if 'id' in kwargs and kwargs['id'] is not None:
-            return cls.model.query.filter_by(user_id=kwargs['id']).all()
+            return cls.model.query.filter_by(user_id=kwargs['id'], active=True).all()
         else:
             return None;
 
