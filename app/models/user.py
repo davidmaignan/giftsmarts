@@ -118,6 +118,15 @@ class FriendRelationShipTypeActions:
             return None
 
 
+class UserCategoryActions:
+
+    @classmethod
+    def filter(cls, user, **kwargs):
+
+        return user.categories
+
+
+
 class UserActions:
     model = User
 
