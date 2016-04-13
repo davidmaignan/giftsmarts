@@ -21,6 +21,7 @@ def get_product(self, user):
 
         if category is None:
             category = CategoryActions.create(product_category)
+            UserActions.add_category(user, category)
 
         UserProductActions.create(user, product_endity, category)
         self.update_state(state='PROGRESS',
