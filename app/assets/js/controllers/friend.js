@@ -1,17 +1,22 @@
 (function(){
     "use strict";
-    function FriendCrtl($scope, $routeParams, UserProductService, FriendRelationshipService, CategoryService, AmazonService, $timeout) {
+    function FriendCrtl($scope, $routeParams, UserProductService, FriendRelationshipService, CategoryService, AmazonService,
+                        UserCategoryService,$timeout) {
         $scope.productDetail = "";
         $scope.friendId = $routeParams.id
         $scope.taskId;
         $scope.progressValue = 3;
         $scope.userProducts = [];
+        $scope.userProductIds = [];
         $scope.maxRequests = 11;
         $scope.totalRequests = 0;
+        $scope.categories = [];
+        $scope.categoryIds = [];
 
         UserProductService.find_all({'userId': $routeParams.id, 'active': 1},
             function(res){
-                $scope.userProducts = res.data;
+                addUserProduct(res);
+                addCategory(res);
 
                 if($scope.userProducts.length === 0) {
                     AmazonService.fetchProducts({'userId': $scope.friendId},
@@ -32,6 +37,30 @@
             }
         );
 
+        function addUserProduct(res){
+            if(res.hasOwnProperty('data')){
+                for(var elt in res.data){
+                    if ($scope.userProductIds.indexOf(res.data[elt].product_id) === -1) {
+                        $scope.userProductIds.push(res.data[elt].product_id);
+                        $scope.userProducts.push(res.data[elt]);
+                     }
+                }
+            }
+        }
+
+        function addCategory(res){
+            if(res.hasOwnProperty('data')) {
+                for(var product in res.data){
+                    if(res.data[product].hasOwnProperty('category')){
+                        if($scope.categoryIds.indexOf(res.data[product].category_id) === -1){
+                            $scope.categoryIds.push(res.data[product].category_id);
+                            $scope.categories.push(res.data[product].category);
+                        }
+                    }
+                }
+            }
+        }
+
         function checkProgressUpdate()
         {
             if($scope.taskId !== null) {
@@ -47,23 +76,15 @@
                                 $timeout(checkProgressUpdate, 1000, true);
                             }
 
-                            if(res.hasOwnProperty('data') === true){
-                                for(var elt in res.data){
-                                    if ($scope.userProducts.indexOf(res.data[elt]) == -1) {
-                                         $scope.userProducts.push(res.data[elt]);
-                                     }
-                                }
-                            }
+                            addUserProduct(res);
+
+                            addCategory(res);
+
                         } else if (res.state === "FAILURE"){
                             console.log("FAILURE TO FIX")
                         } else if (res.state === "SUCCESS") {
-                            if(res.hasOwnProperty('data') === true){
-                                for(var elt in res.data){
-                                    if ($scope.userProducts.indexOf(res.data[elt]) == -1) {
-                                         $scope.userProducts.push(res.data[elt]);
-                                     }
-                                }
-                            }
+                            addUserProduct(res);
+
                             $('#progress-control').hide('slow');
                         } else {
                             console.log(res);
@@ -75,14 +96,6 @@
                 );
             }
         }
-
-        CategoryService.find_all({},
-            function(res) {
-                $scope.categories = res.data
-            }, function(err){
-                console.log(err);
-            }
-        );
 
         FriendRelationshipService.find({'userId': $routeParams.id},
             function(res){
@@ -118,9 +131,7 @@
 
             UserProductService.put({}, userProductObj, function(res){
                     userProduct.active = 0;
-                    console.log(res);
                     var index = $scope.userProducts.indexOf(userProduct);
-                    console.log(index);
                     $scope.userProducts.splice(index, 1);
                     $timeout(isotopeArrange, 100, true);
                 }, function(err){
