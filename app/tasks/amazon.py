@@ -7,12 +7,21 @@ from app.models.category import CategoryActions
 
 @celery.task(bind=True)
 def get_product(self, user):
-    products = amazon.search(Keywords='Star Wars', SearchIndex='Books')
-    category = CategoryActions.find_by_name("Books")
+    products = amazon.search(Keywords='Star Wars', SearchIndex='All')
+    # category = CategoryActions.find_by_name("Books")
+
 
     for index, product in enumerate(products, start=1):   # default is zero
         product_endity = ProductActions.create(product.asin)
         redis.set(product.asin, product.to_string())
+
+        # check category
+        product_category = product.get_attribute('ProductGroup')
+        category = CategoryActions.find_by_name(product_category)
+
+        if category is None:
+            category = CategoryActions.create(product_category)
+
         UserProductActions.create(user, product_endity, category)
         self.update_state(state='PROGRESS',
                           meta={
