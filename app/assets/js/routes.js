@@ -18,6 +18,10 @@
                 templateUrl: '/static/partials/dashboard.html',
                 controller: 'DashboardCtrl'
             })
+            .when('/contact_us/', {
+                templateUrl: '/app/views/contact_us.html',
+                controller: 'ContactUsCtrl'
+            })
             .otherwise({
                 redirectTo: '/404/'
             });

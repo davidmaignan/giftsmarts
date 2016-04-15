@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% include 'leftBar.html' %}
+
+    <div id="page-content-wrapper">
+
+        <div class="container-fluid">
+            <div class="form-container" ng-app="myApp" ng-controller="ContactUsCtrl">
+                <h2>Contact us</h2>
+                <form name="contactForm" novalidate class="form" ng-submit="submitted=true;submit(contactForm)">
+
+                    <div class="form-group">
+                      <label for="topic">Select a topic</label>
+                      <select id="topic" name="topic" ng-model="comment.topic">
+                        <option value="">
+                        <option value="info">General Informations
+                        <option value="acc_support">Account Support
+                        <option value="tech_support">Technical Support
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="subject">Subject</label>
+                      <input id="subject" name="subject" type="text" class="form-control" ng-model="comment.subject"><br><br>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="feedback">Your message:</label><br>
+                      <input id="feedback" name="message" type="textarea" class="form-control" ng-model="comment.feedback"><br><br>
+                    </div>
+
+
+                    <div class="form-group" ng-if="!sent">
+                      <input class="btn btn-success" type="submit" value="Send Message" />
+                      <button ng-click="reset()">RESET</button>
+                    </div>
+                    <div class="form-group" ng-if="sent">
+                      <div class="alert alert-success" role="alert">Form submitted, <b>Thanks!</b></div>
+                    </div>
+                </form>
+
+
+          </div>
+
+        </div>
+        <!-- /#wrapper -->
+    </div>
+
+
+        <script>
+        document.getElementById('logout').onclick = function() {
+            FB.logout(function(response) {
+                console.log(response);
+                window.location.href = "/logout";
+            });
+        };
+
+        </script>
+    </div>
+</div>
+    {% endblock %}

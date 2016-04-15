@@ -332,7 +332,7 @@ def contact_us():
         subject=comment.subject.data,
         feedback=comment.message.data,
         CommentActions.create(user, subject, feedback)
-        return render_template('contactUs.html', success=True, user=user)
+        return render_template('contact_us.html', success=True, user=user)
 
     elif request.method == 'GET':
-        return render_template("contactUs.html", user=user)
+        return render_template("contact_us.html", user=user)
