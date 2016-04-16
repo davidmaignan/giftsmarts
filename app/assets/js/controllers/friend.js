@@ -12,6 +12,7 @@
         $scope.totalRequests = 0;
         $scope.categories = [];
         $scope.categoryIds = [];
+        $scope.wishListTotal = 0;
 
         UserProductService.find_all({'userId': $routeParams.id, 'active': 1},
             function(res){
@@ -43,6 +44,10 @@
                     if ($scope.userProductIds.indexOf(res.data[elt].product_id) === -1) {
                         $scope.userProductIds.push(res.data[elt].product_id);
                         $scope.userProducts.push(res.data[elt]);
+
+                        if(res.data[elt].wish_list) {
+                            $scope.wishListTotal++;
+                        }
                      }
                 }
             }
@@ -117,14 +122,33 @@
             $('#product-detail').hide();
         };
 
-        $scope.reject = function (userProduct) {
-            console.log(userProduct);
-
+        $scope.accept = function(userProduct) {
             var userProductObj = {"data": {
                     "entity": "UserProduct",
                     "user_id": userProduct.user_id,
                     "product_id": userProduct.product_id,
                     "category_id": userProduct.category_id,
+                    "wish_list": 1,
+                    "active": 1
+                }
+            };
+
+            UserProductService.put({}, userProductObj, function(res){
+                console.log(res);
+                $scope.wishListTotal++;
+                }, function(err){
+                console.error(err);
+            });
+
+        }
+
+        $scope.reject = function (userProduct) {
+            var userProductObj = {"data": {
+                    "entity": "UserProduct",
+                    "user_id": userProduct.user_id,
+                    "product_id": userProduct.product_id,
+                    "category_id": userProduct.category_id,
+                    "wish_list": userProduct.wish_list,
                     "active": 0
                 }
             };

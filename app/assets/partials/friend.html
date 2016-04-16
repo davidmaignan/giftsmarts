@@ -4,8 +4,12 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-2">
+    <div class="col-lg-2" style="text-align: center;">
         <img src="https://graph.facebook.com/{{ friend_relationship.friend_id }}/picture?type=large" class="img-thumbnail block"/>
+        <hr />
+        <div class="alert alert-success">
+            Wish list: {{ wishListTotal }} present(s)
+        </div>
     </div>
     <div class="col-lg-8">
         <dl class="dl-horizontal col-lg-12">
@@ -50,7 +54,7 @@
 <section id="isotopeContainer" isotope-container ng-cloak class="ng-cloak">
     <div ng-repeat="product in userProducts " isotope-item class="box grid-item {{product.category.name | slug}}">
         <img src="{{ product.product_details.Item.MediumImage.URL }} "/>
-        <h4><a href="#" ng-click="showDetails(product)">{{ product.product_details.Item.ItemAttributes.Title }}</a></h4>
+        <h4><a href="#" ng-click="showDetails(product)">{{ product.product_details.Item.ItemAttributes.Title | truncate }}</a></h4>
         <p>by: {{ product.product_details.Item.ItemAttributes.Author }}</p>
         <p><strong>{{ product.category.name }}</strong></p>
         <p>Price:
