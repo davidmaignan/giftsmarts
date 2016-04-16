@@ -32,8 +32,8 @@ class User(db.Model):
                              lazy='dynamic')
     to_friends = association_proxy('to_relations', 'to_friend')
     from_owners = association_proxy('from_relations', 'from_owner')
-    categories = relationship("Category", secondary=user_categories)
-    products = relationship("UserProduct", back_populates="user")
+    categories = relationship("Category", secondary=user_categories,  lazy='subquery')
+    products = relationship("UserProduct", back_populates="user",  lazy='subquery')
 
 
 class FriendRelationship(db.Model):

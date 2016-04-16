@@ -35,7 +35,7 @@
         <div ng-repeat="rel in filter_friend_relationships" isotope-item class="box grid-item {{rel.relationship.name | slug}}">
             <img src="https://graph.facebook.com/{{rel.friend_id}}/picture?type=large" class="img-circle"/>
             <h4>{{ rel.to_friend.name }}</h4>
-            <p><span class="badge primary">2</span> Presents</p>
+            <p> Wish list: <span class="badge primary">{{ rel.to_friend.context.wish_total }}</span></p>
             <p class="btn-group" role="group" aria-label="...">
                 <button ng-repeat="relationship_type in relationship_types"
                         type="button" class="btn btn-default relationship-{{ rel.id }} relationship-type-{{relationship_type.id}}"
