@@ -32,5 +32,17 @@
         };
     }]);
 
+    module.filter('truncate', function($sce) {
+        return function(input){
+            if(input !== undefined){
+                if(input.length > 70) {
+                    return input.substring(0, 70) + "...";
+                }
+                return input;
+            }
+
+        };
+    });
+
     module.run(run);
 })();
