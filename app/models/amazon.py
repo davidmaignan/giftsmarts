@@ -12,6 +12,7 @@ class UserProduct(db.Model):
     user = db.relationship("User", back_populates="products")
     category = db.relationship("Category", back_populates="user_products")
     active = db.Column(db.Boolean, default=True)
+    wish_list = db.Column(db.Boolean, default=False)
 
 
 class Product(db.Model):
@@ -43,7 +44,8 @@ class UserProductActions:
         user_product = cls.model.query.filter_by(user_id=data['user_id'],
                                                  product_id=data['product_id'],
                                                  category_id=data['category_id']).one()
-        user_product.active = data['active'] == '1'
+        user_product.active = data['active'] == 1
+        user_product.wish_list = data['wish_list'] == 1
         db.session.commit()
         return user_product
 
