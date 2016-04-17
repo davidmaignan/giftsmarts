@@ -8,7 +8,7 @@
         $scope.progressValue = 3;
         $scope.userProducts = [];
         $scope.userProductIds = [];
-        $scope.maxRequests = 11;
+        $scope.maxRequests = 100;
         $scope.totalRequests = 0;
         $scope.categories = [];
         $scope.categoryIds = [];

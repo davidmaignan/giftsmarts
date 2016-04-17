@@ -3,6 +3,7 @@ from app.config.config import celery, amazon, redis
 from app.models.user import UserActions
 from app.models.amazon import UserProductActions, ProductActions
 from app.models.category import CategoryActions
+from app.constants import AMAZON_CATEGORIES
 from app.models.post import Post
 from app.nlp import nltk
 import random
@@ -19,15 +20,11 @@ def get_product(self, user):
     print('# of searches')
     print(len(searches))
     print('post searches')
-    for i in range(10):
-        print(i)
+    for i in range(3):
         search = random.choice(searches)
-        print(search)
+        print(i, search)
         try:
             ps = amazon.search(Keywords=search, SearchIndex=AMAZON_CATEGORIES[0])
-            print('Post Search')
-            print(ps)
-            print(search)
             for p in ps:
                 product_list[p.title] = p
         except Exception as e:
@@ -39,7 +36,13 @@ def get_product(self, user):
         print(p.title)
         products.append(product_list[p])
 
-    print('# of products')
+    print('Total # of products')
+    print(len(products))
+
+    random.shuffle(products)
+    products = products[:100]
+
+    print('Sliced # of products')
     print(len(products))
 
     for index, product in enumerate(products, start=1):   # default is zero
