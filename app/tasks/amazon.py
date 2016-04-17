@@ -3,13 +3,44 @@ from app.config.config import celery, amazon, redis
 from app.models.user import UserActions
 from app.models.amazon import UserProductActions, ProductActions
 from app.models.category import CategoryActions
+from app.models.post import Post
+from app.nlp import nltk
+import random
 
 
 @celery.task(bind=True)
 def get_product(self, user):
-    products = amazon.search(Keywords='Star Wars', SearchIndex='All')
-    # category = CategoryActions.find_by_name("Books")
 
+    product_list = {}
+    products = []
+
+    searches = nltk.Nltk.generate_searches(Post.query.filter_by(user_id=user.id))
+
+    print('# of searches')
+    print(len(searches))
+    print('post searches')
+    for i in range(10):
+        print(i)
+        search = random.choice(searches)
+        print(search)
+        try:
+            ps = amazon.search(Keywords=search, SearchIndex=AMAZON_CATEGORIES[0])
+            print('Post Search')
+            print(ps)
+            print(search)
+            for p in ps:
+                product_list[p.title] = p
+        except Exception as e:
+            print('Exception')
+            print(e)
+            continue
+
+    for p in product_list.keys():
+        print(p.title)
+        products.append(product_list[p])
+
+    print('# of products')
+    print(len(products))
 
     for index, product in enumerate(products, start=1):   # default is zero
         product_endity = ProductActions.create(product.asin)
