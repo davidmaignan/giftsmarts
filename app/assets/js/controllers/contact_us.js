@@ -1,8 +1,5 @@
-from app.models.comment import CommentActions
-from app.models.user import UserActions
-
 (function() {
-    angular.module("app").controller("ContactUsCtrl", function(EmailResource, $scope) {
+    angular.module("app").controller("ContactUsCtrl", function(ConctactResource, $scope) {
 
             var vm = this;
 
@@ -16,14 +13,16 @@ from app.models.user import UserActions
                 $scope.comment = angular.copy($scope.master);
             };
 
-            $scope.submit = function(form){
+            $scope.submit = function(){
                 
-                CommentActions.create({
-                    user: UserActions.find_by_id(g.user['id']),
-                    subject: $scope.comment.subject,
-                    feedback:  $scope.comment.feedback
-                });
-                
+                var userContactObj = {"data": {
+                    "subject": $scope.comment.subject,
+                    "feedback": $scope.comment.feedback
+                }
+                };
+
+                ConctactResource.post_comment();
+
                 $scope.sent = true;
             };
             $scope.clear();
