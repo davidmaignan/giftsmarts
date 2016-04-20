@@ -8,7 +8,7 @@
         $scope.progressValue = 3;
         $scope.userProducts = [];
         $scope.userProductIds = [];
-        $scope.maxRequests = 11;
+        $scope.maxRequests = 100;
         $scope.totalRequests = 0;
         $scope.categories = [];
         $scope.categoryIds = [];
@@ -71,8 +71,15 @@
             if($scope.taskId !== null) {
                 AmazonService.progressStatus({'taskId': $scope.taskId},
                     function(res){
-                        console.log(res);
-                        $scope.progressValue = parseInt(res.current / res.total * 100);
+                        console.log('Res rpogress status', res);
+
+                        var floatingValue = 0;
+
+                        if (res.current && res.total) {
+                            floatingValue = res.current / res.total;
+                        }
+
+                        $scope.progressValue = parseInt(floatingValue * 100);
                         $scope.totalRequests++;
 
                         if(res.state === "PROGRESS" || res.state === "PENDING"){
