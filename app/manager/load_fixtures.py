@@ -5,7 +5,7 @@ from app.models.event import EventActions
 from app.models.post import PostActions
 from app.models.category import CategoryActions
 from app.constants import AMAZON_CATEGORIES
-from app.models.comment import CommentActions
+# from app.models.comment import CommentActions
 from builtins import open
 
 

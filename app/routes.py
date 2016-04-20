@@ -289,4 +289,3 @@ def check_user_logged_in():
 
     db.session.commit()
     g.user = session.get('user', None)
-
