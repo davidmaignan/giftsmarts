@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, ValidationError, pre_load
+from marshmallow import Schema, fields, ValidationError, pre_load, post_load, post_dump
 from app.models.category import Category
 
 
@@ -20,6 +20,21 @@ class ProductSchema(Schema):
     id = fields.Int(dump_only=True)
 
 
+class UserProductSchema(Schema):
+    id = fields.Int(dump_only=True)
+    user_id = fields.Str()
+    product_id = fields.Str()
+    category_id = fields.Int()
+    product = fields.Nested(ProductSchema, validate=must_not_be_blank)
+    category = fields.Nested(CategorySchema, validate=must_not_be_blank)
+    active = fields.Boolean()
+    wish_list = fields.Boolean();
+
+    class Meta:
+        fields = ("user_id", "product_id", "category_id", "product", "category", "active", "wish_list")
+        ordered = True
+
+
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str()
@@ -37,9 +52,19 @@ class UserDetailSchema(Schema):
     profile_url = fields.Str()
     birthday = fields.Date(dump_only=True)
     categories = fields.List(fields.Nested(CategorySchema))
+    products = fields.List(fields.Nested(UserProductSchema))
+
+    @post_dump
+    def set_wish_total(self, item):
+        total = 0
+        for product in item['products']:
+            if product['wish_list'] is True:
+                total += 1
+        item['context'] = {"wish_total": total}
+        return item
 
     class Meta:
-        fields = ("id", "name", "profile_url", "birthday", "categories")
+        fields = ("id", "name", "profile_url", "birthday", "categories", "products")
         ordered = True
 
 
@@ -66,15 +91,3 @@ class FriendRelationshipSchema(Schema):
         ordered = True
 
 
-class UserProductSchema(Schema):
-    id = fields.Int(dump_only=True)
-    user_id = fields.Str()
-    product_id = fields.Str()
-    category_id = fields.Int()
-    product = fields.Nested(ProductSchema, validate=must_not_be_blank)
-    category = fields.Nested(CategorySchema, validate=must_not_be_blank)
-    active = fields.Boolean()
-
-    class Meta:
-        fields = ("user_id", "product_id", "category_id", "product", "category", "active")
-        ordered = True

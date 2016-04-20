@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
-<<<<<<< HEAD
 {% include 'leftBar.html' %}
 
 <div id="page-content-wrapper">
@@ -52,6 +50,7 @@
 
         <hr/>
         <div id="product-detail" class="hide">
+<<<<<<< HEAD
 =======
 <div id="wrapper">
     <div id="sidebar-wrapper" style="overflow: scroll;">
@@ -76,48 +75,12 @@
     <div id="page-content-wrapper">
         <div class="container-fluid">
 >>>>>>> dev
+=======
+>>>>>>> master
             <div class="row">
                 <div class="col-lg-3 thumbnail" style="overflow: hidden;">
                     <img id="product-detail-image"/>
                 </div>
-<<<<<<< HEAD
-                <div class="col-lg-6">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h2 id="product-detail-title"></h2>
-                            <dl class="dl-horizontal">
-                                <dt>Author:</dt>
-                                <dd id="product-detail-author"></dd>
-                                <dt>ASIN:</dt>
-                                <dd id="product-detail-asin"></dd>
-                                <dt>Label:</dt>
-                                <dd id="product-detail-label"></dd>
-                                <dt>Number of pages:</dt>
-                                <dd id="product-detail-number-pages"></dd>
-                                <dt>Release date:</dt>
-                                <dd id="product-detail-release-date"></dd>
-                                <dt>Description</dt>
-                                <dd id="product-detail-description"></dd>
-                                <dt>Price:</dt>
-                                <dd id="product-detail-price"></dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <a href="#" class="btn btn-danger btn-close">Close</a>
-                </div>
-            </div>
-            <div class="row">
-                <iframe id="amazon-user-reviews" class="col-lg-12" frameBorder="0" ></iframe>
-            </div>
-        </div>
-
-        <section id="main" class="container grid">
-            {% if products | length == 0 %}
-                <h4>We are fetching some suggestions for your friend. It's going to take a few more seconds. <span class="bold" id="progress-status"></span></h4>
-            {% else %}
-=======
             </div>
             <div class="row">
                 <div class="col-lg-2">
@@ -187,7 +150,7 @@
             </div>
 
             <section id="main" class="container grid">
->>>>>>> dev
+
                 {% for product in products %}
                 <div class="box grid-item" data='{{ product | tojson }}'>
                     <img src="
@@ -211,14 +174,9 @@
                     </p>
                 </div>
                 {% endfor %}
-<<<<<<< HEAD
-            {% endif %}
-        </section>
-=======
             </section>
         </div>
         <!-- /#wrapper -->
->>>>>>> dev
     </div>
 </div>
 
@@ -230,6 +188,7 @@ document.getElementById('logout').onclick = function() {
     });
 };
 </script>
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -246,4 +205,6 @@ document.getElementById('logout').onclick = function() {
 </div>
 
 >>>>>>> dev
+=======
+>>>>>>> master
 {% endblock %}

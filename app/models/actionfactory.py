@@ -1,4 +1,4 @@
-from app.models.user import UserActions, FriendRelationshipActions, FriendRelationShipTypeActions
+from app.models.user import UserActions, FriendRelationshipActions, FriendRelationShipTypeActions, UserCategoryActions
 from app.models.friend import FriendActions
 from app.models.amazon import UserProductActions
 from app.models.category import CategoryActions
@@ -20,6 +20,8 @@ class ActionsFactory(object):
             return UserProductActions
         elif entity == "Category":
             return CategoryActions
+        elif entity == "UserCategory":
+            return UserCategoryActions
         assert 0, "Entity not supported: " + entity
         return entity
 

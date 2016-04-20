@@ -9,7 +9,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import exists
 from sqlalchemy.orm import relationship
-from app.models.category import Category, user_categories
+from app.models.category import Category, CategoryActions, user_categories
 from app.models.amazon import UserProduct
 
 
@@ -32,8 +32,8 @@ class User(db.Model):
                              lazy='dynamic')
     to_friends = association_proxy('to_relations', 'to_friend')
     from_owners = association_proxy('from_relations', 'from_owner')
-    categories = relationship("Category", secondary=user_categories)
-    products = relationship("UserProduct", back_populates="user")
+    categories = relationship("Category", secondary=user_categories,  lazy='subquery')
+    products = relationship("UserProduct", back_populates="user",  lazy='subquery')
 
 
 class FriendRelationship(db.Model):
@@ -118,6 +118,15 @@ class FriendRelationShipTypeActions:
             return None
 
 
+class UserCategoryActions:
+
+    @classmethod
+    def filter(cls, user, **kwargs):
+
+        return user.categories
+
+
+
 class UserActions:
     model = User
 
@@ -159,6 +168,13 @@ class UserActions:
                              profile_url=row[2],
                              access_token=row[3],
                              birthday=birthday)
+
+        # Add all category by default
+        categories = CategoryActions.find_all();
+        for category in categories:
+            new_user.categories.append(category)
+
+        db.session.add(new_user)
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -171,6 +187,12 @@ class UserActions:
                              profile_url="",
                              birthday=birthday,
                              access_token=result['access_token'])
+
+        # Add all category by default
+        categories = CategoryActions.find_all();
+        for category in categories:
+            new_user.categories.append(category)
+
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -184,8 +206,15 @@ class UserActions:
                                  profile_url="",
                                  birthday=birthday,
                                  access_token="")
+
+            # Add all category by default
+            categories = CategoryActions.find_all();
+            for category in categories:
+                new_user.categories.append(category)
+
             db.session.add(new_user)
             db.session.commit()
+
             return new_user
         else:
             return UserActions.find_by_id(user['id'])

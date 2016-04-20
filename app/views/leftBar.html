@@ -20,10 +20,19 @@
     </p>
 
     <div>
+<<<<<<< HEAD
         {% for friend in user.to_friends %}
             <a href="">
                 <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small" style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
             </a>
         {% endfor %}
     </div>
+=======
+    {% for friend in user.to_friends %}
+    <a href="/friend/{{ friend.id }}">
+        <img src="https://graph.facebook.com/{{friend['id']}}/picture?type=small"
+             style="margin: 5px; border: 1px solid #545454;" class="img-circle"/>
+    </a>
+    {% endfor %}
+>>>>>>> master
 </div>
