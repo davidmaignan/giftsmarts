@@ -292,7 +292,6 @@ def check_user_logged_in():
 
     db.session.commit()
     g.user = session.get('user', None)
-<<<<<<< HEAD
 
 @app.route('/user_feedback/', methods=['GET', 'POST'])
 def user_feedback():
@@ -322,5 +321,3 @@ def contact_us():
 
     elif request.method == 'GET':
         return render_template("contact_us.html", user=user)
-=======
->>>>>>> master
